@@ -1,0 +1,88 @@
+Simple firewall to block network access on workstations
+-------------------------------------------------------
+
+This firewall blocks all outgoing and incoming connections by
+default. Selected network conections can be allowed with two
+whitelists. One for HTTP (Web) URLs and another for network
+connections.
+
+This firewall script was originally developed to allow selected
+network connections during exams for the "Lernstick Exam
+Environment". A Debian Live based distribution for running exams in a
+stripped down environment. There is nothing in it that prevents it's
+use in other contexts where a simple firewall to block outgoing
+connections is needed.
+
+This package is not useful as a general firewall. It is intended for
+workstations and not for routers forwarding packets.
+
+** Technical Overview **
+
+The script sets up the following firewall rules:
+
+ * Blocking all connections by default
+ * Allow outgoing DNS traffic to enable name resolution
+ * Redirection of all connections to port 80 to a transparent proxy.
+   The proxy does not allow any URLs by default.
+ * Whitelist to allow additional connections by protocol (TCP or UDP),
+   destination (hostname, network or IP address) and destination port.
+ * Logging of unauthorized access to syslog.
+
+Tinyproxy (https://banu.com/tinyproxy/) is used as a transparent proxy
+to allow access to selected URLs. The proxy is run under a separate
+UID with a lernstick-firewall specific configuration. It does not use
+the standard tinyproxy configuration and init script.
+
+** Configuration **
+
+All configuration files are in /etc/lernstick-firewall.
+
+*** lernstick-firewall.conf ***
+
+Main configuration file to set proxy port, proxy uid and whitelist
+file locations.
+
+*** tinyproxy.conf ***
+
+Configuration for tinyproxy. See man tinyproxy.conf for details. But
+be aware that changeing settings in this file might weaken the
+security of the firewall.
+
+*** url_whitelist ***
+
+Whitelist file to allow access to selected URLs. One URL per line.
+Matching is done with regular expressions. Only parts of the URL have
+to match. If you want to match the full URL, prepend your pattern with
+"^http://". You have to specify the TCP port for in the URL (usually
+80) even if you don't enter this as part of the URL in your browser
+(see examples below). Matching is done case insensitive by default.
+This can be changed in tinyproxy.conf.
+
+Examples:
+Allow everything about firewalls on wikipedia. This also allows
+http://en.wikipedia.org/wiki/Firewall_(computing).
+
+    ^http://en.wikipedia.org:80/wiki/Firewall
+
+Allow only one exact URL
+
+    ^http://en.wikipedia.org:80/wiki/Firewall$
+    
+Allow everything that contains the word firewall:
+
+    firewall
+    
+*** net_whitelist ***
+
+file for additional firewall rules
+FILE FORMAT: One rule per line, protocol target port (space separated)
+protocol is either tcp or udp
+target can be a hostname, netmaks or ip address
+port is either a port name form /etc/services or a numerical port
+lines starting with # are ignored
+
+Example:
+# allow printing to HP JetDirect at printer.local
+tcp printer.local 9100
+
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Thu, 06 Sep 2013 15:51:53 +0200

@@ -1,0 +1,8 @@
+debian/files
+debian/lernstick-firewall.debhelper.log
+debian/lernstick-firewall.postinst.debhelper
+debian/lernstick-firewall.postrm.debhelper
+debian/lernstick-firewall.prerm.debhelper
+debian/lernstick-firewall.substvars
+debian/lernstick-firewall/
+

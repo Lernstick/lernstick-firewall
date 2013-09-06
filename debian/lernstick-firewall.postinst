@@ -1,0 +1,47 @@
+#! /bin/sh
+
+set -e
+
+if [ "$1" = "configure" ]; then
+
+    username=lernstick-firewall
+
+	# Create the "${username}" user
+	if ! getent passwd ${username} > /dev/null; then
+		adduser --quiet --system --group --home /nonexistent  \
+			--no-create-home                                 \
+			--gecos "Lernstick Exam Environment filtering proxy" \
+			${username}
+	fi
+
+    # Create the "${username}" group, if it is missing, and set the
+    # primary group of the "${username}" user to this group.
+    if ! getent group ${username} > /dev/null; then
+        addgroup --quiet --system ${username}
+        usermod -g ${username} ${username}
+    fi
+
+    # fix logdir permissions, keep admin overrides done 
+    # with dpkg-statoverride
+
+    # only do something when no setting exists
+    logdir=/var/log/lernstick-firewall
+    if ! dpkg-statoverride --list ${logdir} >/dev/null 2>&1 
+    then
+        dpkg-statoverride --update --add ${username} adm 0750 ${logdir}
+    fi
+
+    # fix configfile permissions, keep admin overrides
+    confdir="/etc/lernstick-firewall"
+    conffiles="${confdir}/lernstick-firewall.conf
+               ${confdir}/tinyproxy.conf
+               ${confdir}/url_whitelist
+               ${confdir}/net_whitelist"
+    for cf in ${conffiles}; do
+        if ! dpkg-statoverride --list ${cf} > /dev/null 2>&1 ; then
+            dpkg-statoverride --update --add root ${username} 0640 ${cf}
+        fi
+    done
+fi
+
+#DEBHELPER#

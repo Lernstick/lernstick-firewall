@@ -1,0 +1,30 @@
+Source: lernstick-firewall
+Section: net
+Priority: extra
+Maintainer: Gaudenz Steinlin <gaudenz@debian.org>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: http://github.com/imedias/lernstick-firewall
+Vcs-Git: git://github.com/imedias/lernstick-firewall.git
+Vcs-Browser: http://github.com/imedias/lernstick-firewall
+
+Package: lernstick-firewall
+Architecture: all
+Depends: tinyproxy, adduser, lsb-base (>= 3.2-14), ${misc:Depends}
+Description: Simple firewall to block network access on workstations
+ This firewall blocks all outgoing and incoming connections by
+ default. Selected network conections can be allowed with two
+ whitelists. One for HTTP (Web) URLs and another for network
+ connections.
+ .
+ This firewall script was originally developed to allow selected
+ network connections during exams for the "Lernstick Exam
+ Environment". A Debian Live based distribution for running exams in a
+ stripped down environment. There is nothing in it that prevents it's
+ use in other contexts where a simple firewall to block outgoing
+ connections is needed.
+ .
+ This package is not useful as a general firewall. It is intended for
+ workstations and not for routers forwarding packets.
+
+

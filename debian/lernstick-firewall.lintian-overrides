@@ -1,0 +1,3 @@
+# restrictive file permissions for firewall configuration
+# normal users should not be able to read these files
+non-standard-file-perm etc/lernstick-firewall/*

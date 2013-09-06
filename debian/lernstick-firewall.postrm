@@ -1,0 +1,32 @@
+#! /bin/sh
+
+set -e
+
+if [ "$1" = "purge" ]; then
+
+    logdir="/var/log/lernstick-firewall"
+
+    # remove logfiles, the logdir itself is removed as part of the packge
+    rm -rf ${logdir}/*
+    
+    # remove statoverride
+    if dpkg-statoverride --list $logdir >/dev/null 2>&1
+    then
+        dpkg-statoverride --remove $logdir
+    fi
+
+    # remove statoverrides for conffiles
+    confdir="/etc/lernstick-firewall"
+    conffiles="${confdir}/lernstick-firewall.conf
+               ${confdir}/tinyproxy.conf
+               ${confdir}/url_whitelist
+               ${confdir}/net_whitelist"
+    for cf in ${conffiles}; do
+        if dpkg-statoverride --list ${cf} > /dev/null 2>&1 ; then
+            dpkg-statoverride --remove ${cf}
+        fi
+    done
+
+fi
+
+#DEBHELPER#

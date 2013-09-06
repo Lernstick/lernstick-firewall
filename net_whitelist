@@ -1,0 +1,10 @@
+# Lernstick firewall whitelist
+
+# FILE FORMAT: One rule per line, protocol target port (space separated)
+# protocol is either tcp or udp
+# target can be a hostname, netmaks or ip address
+# port is either a port name form /etc/services or a numerical port
+# lines starting with # are ignored
+
+# Example to allow TCP connections to port 9100 at printer.local
+# tcp printer.local 9100

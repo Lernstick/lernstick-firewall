@@ -1,0 +1,160 @@
+#!/bin/sh
+# Simple firewall to block network access on workstations
+# Copyright (C) 2013  Gaudenz Steinlin <gaudenz@debian.org>
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+IPTABLES="/sbin/iptables"
+
+# Read configuration variable file if it is present
+[ -r /etc/lernstick-firewall/lernstick-firewall.conf ] && . /etc/lernstick-firewall/lernstick-firewall.conf
+
+# Parse tinyproxy configuration file, use standard config file if
+# PROXY_CONF is not set
+[ -z ${PROXY_CONF} ] && PROXY_CONF="/etc/tinyproxy.conf"
+
+PROXY_UID=$(grep  -i '^User[[:space:]]'  "${PROXY_CONF}" | awk '{print $2}')
+PROXY_GID=$(grep  -i '^Group[[:space:]]' "${PROXY_CONF}" | awk '{print $2}')
+PROXY_PORT=$(grep -i '^Port[[:space:]]'  "${PROXY_CONF}" | awk '{print $2}')
+
+#
+# function to add a rule
+#
+# $1 tcp or udp
+# $2 target, hostname, network or ip
+# $3 port
+add_rule ()
+{
+    ${IPTABLES} --append OUTPUT --protocol ${1} --destination ${2} --dport ${3} --jump ACCEPT
+}
+
+#
+# Start the firewall
+#
+do_start()
+{
+	# Return
+	#   0 if daemon has been started
+	#   1 if daemon was already running
+	#   2 if daemon could not be started
+
+    # Default policies
+    ${IPTABLES} --policy INPUT DROP
+    ${IPTABLES} --policy OUTPUT DROP
+
+    # This is not strictly needed as this script is not intended to 
+    # be used on machines forwarding packets. But just in case to be
+    # safe.
+    ${IPTABLES} --policy FORWARD DROP
+
+    # allow incoming related packages
+    ${IPTABLES} --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+
+    # allow all connections to and from localhost
+    ${IPTABLES} --append INPUT --in-interface lo --destination 127.0.0.0/8 --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --out-interface lo --source 127.0.0.0/8 --jump ACCEPT
+
+    # Allow outgoing DNS traffic
+    ${IPTABLES} --append OUTPUT --protocol udp --dport domain --jump ACCEPT
+
+    # access to local proxy
+    ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT} --jump ACCEPT
+
+    # allow outgoing traffic for proxy to port 80 on any server
+    ${IPTABLES} --append OUTPUT --protocol tcp --dport http --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
+
+    # transparent proxy for port 80
+    ${IPTABLES} --table nat --append OUTPUT --protocol tcp --dport http --match owner ! --uid-owner ${PROXY_UID} ! --gid-owner ${PROXY_GID} --jump REDIRECT --to-port ${PROXY_PORT}
+
+    # configure additional firewall rules
+    if [ -r ${RULES_FILE} ] ; then
+        # loop over non-empty non comment lines
+        grep --extended-regexp --invert-match '^[[:space:]]*(#.*)?$' ${RULES_FILE} | while read line ; do
+            add_rule ${line}
+        done
+    fi
+    
+    # Log rejected traffic
+    ${IPTABLES} --append INPUT --jump LOG
+    ${IPTABLES} --append OUTPUT --jump LOG
+
+    # reject local outgoing pakets instead of just dropping
+    ${IPTABLES} --append OUTPUT --jump REJECT
+
+}
+
+# Flush firewall rules
+do_flush()
+{
+    # Flush all chains we modify
+    ${IPTABLES} --flush INPUT
+    ${IPTABLES} --flush OUTPUT
+    ${IPTABLES} --table nat --flush OUTPUT
+
+}
+
+#
+# Stop firewall and allow everything
+#
+do_stop()
+{
+	# Return
+	#   0 if daemon has been stopped
+	#   1 if daemon was already stopped
+	#   2 if daemon could not be stopped
+	#   other if a failure occurred
+
+    # flush rules
+    do_flush
+
+    # Set default policy to allow
+    ${IPTABLES} --policy INPUT ACCEPT
+    ${IPTABLES} --policy OUTPUT ACCEPT
+}
+
+#
+# Reload rules
+#
+do_reload() {
+
+    # Flush rules
+    do_flush
+
+    # load new rules
+    do_start
+
+	return 0
+}
+
+case "$1" in
+  start)
+	do_start
+	;;
+  stop)
+	do_stop
+	;;
+  reload)
+	do_reload
+	;;
+  restart)
+	do_stop
+	do_start
+	;;
+  *)
+	echo "Usage: $0 {start|stop|reload|restart}" >&2
+	exit 3
+	;;
+esac
+
+:

@@ -1,0 +1,55 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" (C) Copyright 2013 Gaudenz Steinlin <gaudenz@debian.org>,
+.\"
+.TH lernstick-firewall 8 "2013-09-06"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+lernstick-firewall \- Simple firewall to block network access on workstations
+.SH SYNOPSIS
+.B lernstick-firewall
+.RI start|stop|reload|restart
+.SH DESCRIPTION
+
+This firewall blocks all outgoing and incoming connections by
+default. Selected network conections can be allowed with two
+whitelists. One for HTTP (Web) URLs and another for network
+connections.
+
+This firewall script was originally developed to allow selected
+network connections during exams for the "Lernstick Exam
+Environment". A Debian Live based distribution for running exams in a
+stripped down environment. There is nothing in it that prevents it's
+use in other contexts where a simple firewall to block outgoing
+connections is needed.
+
+This package is not useful as a general firewall. It is intended for
+workstations and not for routers forwarding packets.
+
+.PP
+
+.SH OPTIONS
+
+The script accepts either
+.B start,
+.B stop,
+.B reload
+or
+.B restart
+as a command. These commands only change the iptables rules part of the firewall. 
+Tinyproxy is not reloaded by this script. To do a full reload, use the init script.
+
+.SH SEE ALSO
+.BR /usr/share/doc/lernstick-firewall/README,
+.BR /etc/init.d/lernstick-firewall.
+
