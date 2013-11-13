@@ -65,6 +65,12 @@ do_start()
     ${IPTABLES} --append INPUT --in-interface lo --destination 127.0.0.0/8 --jump ACCEPT
     ${IPTABLES} --append OUTPUT --out-interface lo --source 127.0.0.0/8 --jump ACCEPT
 
+    # Allow ICMP traffic to ourselves, otherwise the ICMP port unreachables don't reach us.
+    # These are sent to the public IP address of the interface, but come out of loopback
+    # as the public IP is not known and might change, just allow every ICMP out of loopback.
+    # ICMP traffic to other hosts is not sent out of loopback and not allowed by this rule.
+    ${IPTABLES} --append OUTPUT --out-interface lo --protocol ICMP --jump ACCEPT
+
     # Allow outgoing DNS traffic
     ${IPTABLES} --append OUTPUT --protocol udp --dport domain --jump ACCEPT
 
