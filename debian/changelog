@@ -1,3 +1,9 @@
+lernstick-firewall (1.1) unstable; urgency=low
+
+  * [cddb] Allow ICMP traffic to ourselves
+
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Wed, 13 Nov 2013 11:09:18 +0100
+
 lernstick-firewall (1.0) unstable; urgency=low
 
   * Initial Release.
