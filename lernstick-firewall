@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 IPTABLES="/sbin/iptables"
+IP6TABLES="/sbin/ip6tables"
 
 # Read configuration variable file if it is present
 [ -r /etc/lernstick-firewall/lernstick-firewall.conf ] && . /etc/lernstick-firewall/lernstick-firewall.conf
@@ -57,6 +58,11 @@ do_start()
     # be used on machines forwarding packets. But just in case to be
     # safe.
     ${IPTABLES} --policy FORWARD DROP
+
+    # Also drop all IPv6 traffic until we have proper IPv6 support
+    ${IP6TABLES} --policy INPUT DROP
+    ${IP6TABLES} --policy OUTPUT DROP
+    ${IP6TABLES} --policy FORWARD DROP
 
     # allow incoming related packages
     ${IPTABLES} --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
@@ -127,6 +133,12 @@ do_stop()
     # Set default policy to allow
     ${IPTABLES} --policy INPUT ACCEPT
     ${IPTABLES} --policy OUTPUT ACCEPT
+
+    # Also renable all IPv6 traffic
+    ${IP6TABLES} --policy INPUT ACCEPT
+    ${IP6TABLES} --policy OUTPUT ACCEPT
+    ${IP6TABLES} --policy FORWARD ACCEPT
+
 }
 
 #
