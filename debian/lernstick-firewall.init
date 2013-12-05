@@ -36,12 +36,18 @@ SCRIPTNAME=/etc/init.d/$NAME
 # assert pidfile directory and permissions
 . /etc/lernstick-firewall/lernstick-firewall.conf
 
-if [ -f "$PROXY_CONF" ]; then
+if [ -r "$PROXY_CONF" ]; then
     USER=$(grep    -i '^User[[:space:]]'    "$PROXY_CONF" | awk '{print $2}')
     GROUP=$(grep   -i '^Group[[:space:]]'   "$PROXY_CONF" | awk '{print $2}')
     PIDFILE=$(grep -i '^PidFile[[:space:]]' "$PROXY_CONF" | awk '{print $2}' |\
               sed -e 's/"//g')
     PIDDIR=`dirname "$PIDFILE"`
+else
+    log_action_msg "Tinyproxy configuration not found. Not starting lernstick-firewall"
+    exit 1
+fi
+
+if [ "$1" != "stop" ]; then
     if [ -n "$PIDDIR" -a "$PIDDIR" != "/var/run" ]; then
         if [ ! -d "$PIDDIR" ]; then
             mkdir "$PIDDIR"
