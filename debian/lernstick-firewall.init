@@ -68,10 +68,11 @@ do_start()
     #   1 if daemon was already running
     #   2 if daemon could not be started
 
+    RETVAL="0"
+
     # start firewall rules
     [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "iptables"
-    ${FIREWALL} start
-    RETVAL="$?"
+    ${FIREWALL} start || RETVAL="2"
 
     if [ "$RETVAL" -eq 0 ]; then
         [ "$VERBOSE" != no ] && log_progress_msg "tinyproxy"
@@ -105,10 +106,11 @@ do_stop()
     #   2 if daemon could not be stopped
     #   other if a failure occurred
 
+    RETVAL="0"
+
     # stop firewall rules
     [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "iptables"
-    ${FIREWALL} stop
-    RETVAL="$?"
+    ${FIREWALL} stop || RETVAL="2"
 
     if [ "$RETVAL" -eq 0 ]; then
         [ "$VERBOSE" != no ] && log_progress_msg "tinyproxy"
@@ -136,9 +138,10 @@ do_stop()
 #
 do_reload() 
 {
+    RETVAL="0"
+
     log_daemon_msg "Reloading $DESC" "iptables"
-    ${FIREWALL} reload
-    RETVAL="$?"
+    ${FIREWALL} reload || RETVAL="2"
 
     if [ "$RETVAL" -eq 0 ]; then
         log_progress_msg "tinyproxy"
