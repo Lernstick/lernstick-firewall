@@ -1,3 +1,17 @@
+lernstick-firewall (1.2) unstable; urgency=low
+
+  * [b0d3] Drop all IPv6 traffic
+  * [4e04] Re-enable FORWARD chain on stop
+  * [e0b3] Flush rules before starting the firewall
+  * [ecec] Also parse proxy configuration on stop
+  * [5425] Only start if tinyproxy config is readable
+  * [0fb4] Process iptables rules before tinyproxy
+  * [2f93] Improve service script output and robustness
+  * [1831] Don't read /etc/default/lernstick-firewall
+  * [f6b1] Correctly catch errors of the iptables script
+
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Thu, 05 Dec 2013 16:20:55 +0100
+
 lernstick-firewall (1.1) unstable; urgency=low
 
   * [cddb] Allow ICMP traffic to ourselves
