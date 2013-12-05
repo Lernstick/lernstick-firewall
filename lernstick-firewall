@@ -133,6 +133,7 @@ do_stop()
     # Set default policy to allow
     ${IPTABLES} --policy INPUT ACCEPT
     ${IPTABLES} --policy OUTPUT ACCEPT
+    ${IPTABLES} --policy FORWARD ACCEPT
 
     # Also renable all IPv6 traffic
     ${IP6TABLES} --policy INPUT ACCEPT
