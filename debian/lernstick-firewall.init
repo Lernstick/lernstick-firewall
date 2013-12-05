@@ -71,6 +71,9 @@ do_start()
     #   1 if daemon was already running
     #   2 if daemon could not be started
 
+    # start firewall rules
+    ${FIREWALL} start
+
     start-stop-daemon --start --quiet  --exec $TINYPROXY --pidfile $PIDFILE --test > /dev/null \
         || return 1
     start-stop-daemon --start --quiet --exec $TINYPROXY --pidfile $PIDFILE -- -c $PROXY_CONF \
@@ -79,8 +82,6 @@ do_start()
     # to handle requests from services started subsequently which depend
     # on this one.  As a last resort, sleep for some time.
 
-    # start firewall rules
-    ${FIREWALL} start
 }
 
 #
@@ -93,6 +94,10 @@ do_stop()
     #   1 if daemon was already stopped
     #   2 if daemon could not be stopped
     #   other if a failure occurred
+
+    # stop firewall rules
+    ${FIREWALL} stop
+
     start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name tinyproxy
     RETVAL="$?"
     [ "$RETVAL" = 2 ] && return 2
@@ -100,9 +105,6 @@ do_stop()
     # If tinyproxy had to be KILLed it might not have removed it's pidfile
     rm -f $PIDFILE
     
-    # stop firewall rules
-    ${FIREWALL} stop
-
     return "$RETVAL"
 }
 
@@ -116,8 +118,8 @@ do_reload()
     # restarting (for example, when it is sent a SIGHUP),
     # then implement that here.
     #
-    start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name tinyproxy
     ${FIREWALL} reload
+    start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name tinyproxy
     return 0
 }
 
