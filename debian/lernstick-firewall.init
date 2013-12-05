@@ -36,23 +36,21 @@ SCRIPTNAME=/etc/init.d/$NAME
 # assert pidfile directory and permissions
 . /etc/lernstick-firewall/lernstick-firewall.conf
 
-if [ "$1" != "stop" ]; then
-    if [ -f "$PROXY_CONF" ]; then
-        USER=$(grep    -i '^User[[:space:]]'    "$PROXY_CONF" | awk '{print $2}')
-        GROUP=$(grep   -i '^Group[[:space:]]'   "$PROXY_CONF" | awk '{print $2}')
-        PIDFILE=$(grep -i '^PidFile[[:space:]]' "$PROXY_CONF" | awk '{print $2}' |\
-                  sed -e 's/"//g')
-        PIDDIR=`dirname "$PIDFILE"`
-        if [ -n "$PIDDIR" -a "$PIDDIR" != "/var/run" ]; then
-            if [ ! -d "$PIDDIR" ]; then
-                mkdir "$PIDDIR"
-            fi
-            if [ "$USER" ]; then
-                chown "$USER" "$PIDDIR"
-            fi
-            if [ "$GROUP" ]; then
-                chgrp "$GROUP" "$PIDDIR"
-            fi
+if [ -f "$PROXY_CONF" ]; then
+    USER=$(grep    -i '^User[[:space:]]'    "$PROXY_CONF" | awk '{print $2}')
+    GROUP=$(grep   -i '^Group[[:space:]]'   "$PROXY_CONF" | awk '{print $2}')
+    PIDFILE=$(grep -i '^PidFile[[:space:]]' "$PROXY_CONF" | awk '{print $2}' |\
+              sed -e 's/"//g')
+    PIDDIR=`dirname "$PIDFILE"`
+    if [ -n "$PIDDIR" -a "$PIDDIR" != "/var/run" ]; then
+        if [ ! -d "$PIDDIR" ]; then
+            mkdir "$PIDDIR"
+        fi
+        if [ "$USER" ]; then
+            chown "$USER" "$PIDDIR"
+        fi
+        if [ "$GROUP" ]; then
+            chgrp "$GROUP" "$PIDDIR"
         fi
     fi
 fi
