@@ -1,3 +1,9 @@
+lernstick-firewall (1.3) unstable; urgency=medium
+
+  * [0c79] Allow connections to localhost via IPv6
+
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Mon, 12 May 2014 14:27:08 +0200
+
 lernstick-firewall (1.2) unstable; urgency=low
 
   * [b0d3] Drop all IPv6 traffic
