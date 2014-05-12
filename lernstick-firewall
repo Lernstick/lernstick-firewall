@@ -73,9 +73,11 @@ do_start()
     # allow incoming related packages
     ${IPTABLES} --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
 
-    # allow all connections to and from localhost
+    # allow all connections to and from localhost, even for IPv6
     ${IPTABLES} --append INPUT --in-interface lo --destination 127.0.0.0/8 --jump ACCEPT
     ${IPTABLES} --append OUTPUT --out-interface lo --source 127.0.0.0/8 --jump ACCEPT
+    ${IP6TABLES} --append INPUT --in-interface lo --destination ::1/128 --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --out-interface lo --source ::1/128 --jump ACCEPT
 
     # Allow ICMP traffic to ourselves, otherwise the ICMP port unreachables don't reach us.
     # These are sent to the public IP address of the interface, but come out of loopback
@@ -119,7 +121,8 @@ do_flush()
     ${IPTABLES} --flush INPUT
     ${IPTABLES} --flush OUTPUT
     ${IPTABLES} --table nat --flush OUTPUT
-
+    ${IP6TABLES} --flush INPUT
+    ${IP6TABLES} --flush OUTPUT
 }
 
 #
