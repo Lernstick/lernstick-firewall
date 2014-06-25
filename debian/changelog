@@ -1,3 +1,12 @@
+lernstick-firewall (1.4) unstable; urgency=medium
+
+  * [8d86] Update Standards-Version to 3.9.5 (no changes needed)
+  * [7383] Add if-up script to reload firewall
+  * [9d71] Don't abort if a whitelist rule fails
+  * [e5fc] Start tinyproxy even if some firewall rules fail
+
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Wed, 25 Jun 2014 17:52:14 +0200
+
 lernstick-firewall (1.3) unstable; urgency=medium
 
   * [0c79] Allow connections to localhost via IPv6
