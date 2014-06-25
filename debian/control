@@ -3,7 +3,7 @@ Section: net
 Priority: extra
 Maintainer: Gaudenz Steinlin <gaudenz@debian.org>
 Build-Depends: debhelper (>= 8.0.0)
-Standards-Version: 3.9.4
+Standards-Version: 3.9.5
 Homepage: http://github.com/imedias/lernstick-firewall
 Vcs-Git: git://github.com/imedias/lernstick-firewall.git
 Vcs-Browser: http://github.com/imedias/lernstick-firewall
