@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Simple firewall to block network access on workstations
 # Copyright (C) 2013  Gaudenz Steinlin <gaudenz@debian.org>
 
@@ -32,15 +32,22 @@ PROXY_UID=$(grep  -i '^User[[:space:]]'  "${PROXY_CONF}" | awk '{print $2}')
 PROXY_GID=$(grep  -i '^Group[[:space:]]' "${PROXY_CONF}" | awk '{print $2}')
 PROXY_PORT=$(grep -i '^Port[[:space:]]'  "${PROXY_CONF}" | awk '{print $2}')
 
+# return value
+RET=0
+
 #
-# function to add a rule
+# function to add a rule to the whitelist
 #
 # $1 tcp or udp
 # $2 target, hostname, network or ip
 # $3 port
 add_rule ()
 {
-    ${IPTABLES} --append OUTPUT --protocol ${1} --destination ${2} --dport ${3} --jump ACCEPT
+    # Don't fail if an entry ist not resolveable
+    if ! ${IPTABLES} --append whitelist --protocol ${1} --destination ${2} --dport ${3} --jump ACCEPT > /dev/null 2>&1  ; then
+        echo "Setting whitelist for ${1} to ${2} on port ${3} failed." 1>&2
+        RET=1
+    fi
 }
 
 #
@@ -97,21 +104,28 @@ do_start()
     # transparent proxy for port 80
     ${IPTABLES} --table nat --append OUTPUT --protocol tcp --dport http --match owner ! --uid-owner ${PROXY_UID} ! --gid-owner ${PROXY_GID} --jump REDIRECT --to-port ${PROXY_PORT}
 
+    # whitelist rules chain, this chain will always be traversed on OUTPUT
+    ${IPTABLES} --new-chain whitelist
+    ${IPTABLES} --append OUTPUT --jump whitelist
+
     # configure additional firewall rules
     if [ -r ${RULES_FILE} ] ; then
-        # loop over non-empty non comment lines
-        grep --extended-regexp --invert-match '^[[:space:]]*(#.*)?$' ${RULES_FILE} | while read line ; do
+        # loop over non-empty non comment lines, this funny construct is needed to not
+        # spawn a subshell. Using a pipe would spawn a subshell. This redirects the output
+        # of the grep command into the for loop where it's read line by line.
+        # We don't want to spawn a subshell because otherwise the RET global variable can't be
+        # set from inside the loop.
+        while read line ; do
             add_rule ${line}
-        done
+        done < <(grep --extended-regexp --invert-match '^[[:space:]]*(#.*)?$' ${RULES_FILE})
     fi
-    
+
     # Log rejected traffic
     ${IPTABLES} --append INPUT --jump LOG
     ${IPTABLES} --append OUTPUT --jump LOG
 
     # reject local outgoing pakets instead of just dropping
     ${IPTABLES} --append OUTPUT --jump REJECT
-
 }
 
 # Flush firewall rules
@@ -121,6 +135,10 @@ do_flush()
     ${IPTABLES} --flush INPUT
     ${IPTABLES} --flush OUTPUT
     ${IPTABLES} --table nat --flush OUTPUT
+    if ${IPTABLES} --list whitelist -n >/dev/null 2>&1 ; then
+        ${IPTABLES} --flush whitelist
+        ${IPTABLES} --delete-chain whitelist
+    fi
     ${IP6TABLES} --flush INPUT
     ${IP6TABLES} --flush OUTPUT
 }
@@ -181,5 +199,7 @@ case "$1" in
 	exit 3
 	;;
 esac
+
+exit ${RET}
 
 :
