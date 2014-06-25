@@ -74,13 +74,10 @@ do_start()
     [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "iptables"
     ${FIREWALL} start || RETVAL="2"
 
-    if [ "$RETVAL" -eq 0 ]; then
+    # start tinyproxy if it's not running
+    if start-stop-daemon --start --quiet  --exec $TINYPROXY --pidfile $PIDFILE --test > /dev/null ; then
         [ "$VERBOSE" != no ] && log_progress_msg "tinyproxy"
-        start-stop-daemon --start --quiet  --exec $TINYPROXY --pidfile $PIDFILE --test > /dev/null \
-            || return 1
-        start-stop-daemon --start --quiet --exec $TINYPROXY --pidfile $PIDFILE -- -c $PROXY_CONF \
-            || return 2
-        RETVAL="$?"
+        start-stop-daemon --start --quiet --exec $TINYPROXY --pidfile $PIDFILE -- -c $PROXY_CONF || RETVAL="2"
     fi
 
     case "$RETVAL" in
@@ -112,11 +109,9 @@ do_stop()
     [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "iptables"
     ${FIREWALL} stop || RETVAL="2"
 
-    if [ "$RETVAL" -eq 0 ]; then
-        [ "$VERBOSE" != no ] && log_progress_msg "tinyproxy"
-        start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name tinyproxy
-        RETVAL="$?"
-    fi
+    [ "$VERBOSE" != no ] && log_progress_msg "tinyproxy"
+    start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name tinyproxy || RETVAL="2"
+
     case "$RETVAL" in
         0|1)
             [ "$VERBOSE" != no ] && log_end_msg 0
@@ -143,11 +138,8 @@ do_reload()
     log_daemon_msg "Reloading $DESC" "iptables"
     ${FIREWALL} reload || RETVAL="2"
 
-    if [ "$RETVAL" -eq 0 ]; then
-        log_progress_msg "tinyproxy"
-        start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name tinyproxy
-        RETVAL="$?"
-    fi
+    log_progress_msg "tinyproxy"
+    start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name tinyproxy || RETVAL="2"
 
     case "$RETVAL" in
         0|1)
