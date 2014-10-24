@@ -1,3 +1,11 @@
+lernstick-firewall (1.5) unstable; urgency=medium
+
+  * [84d9] Function to set default policy
+  * [e205] Add trap to block everything on failure
+  * [d9d6] Resolve hostnames before enableing the block policy
+
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Fri, 24 Oct 2014 15:31:28 +0200
+
 lernstick-firewall (1.4) unstable; urgency=medium
 
   * [8d86] Update Standards-Version to 3.9.5 (no changes needed)
