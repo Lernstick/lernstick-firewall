@@ -70,6 +70,39 @@ set_default ()
 }
 
 #
+# function to read in the rules file and resolve names
+#
+# This must be called while DNS is (still) working. This mostly
+# means before the all block rule.
+read_rules ()
+{
+    grep --extended-regexp --invert-match '^[[:space:]]*(#.*)?$' ${RULES_FILE} | while read line ; do
+        resolve_rule ${line}
+    done
+}
+
+#
+# function to resolv all DNS names in rules first
+#
+# This avoids situation where some rules are needed to regain
+# connectivity to the DNS Server (eg. VPN with default route)
+# $1 tcp or udp
+# $2 target, hostname, network or ip
+# $3 port
+resolve_rule ()
+{
+    proto=${1}
+    host=${2}
+    dport=${3}
+    # resolve hostnames and convert to comma separated list
+    ips=$(dig ${host} +short | grep -Ev '\.$' | tr '\n' ',' | sed -e 's/.$//')
+    # Only use this if there is a result, otherwise use the original host field
+    [ -n "${ips}" ] && host=${ips}
+    # print modified rule
+    echo ${proto} ${host} ${dport}
+}
+
+#
 # function to add a rule to the whitelist
 #
 # $1 tcp or udp
@@ -94,6 +127,10 @@ do_start()
 	#   1 if daemon was already running
 	#   2 if daemon could not be started
 
+    # Resolve rules first. This avoids the case where DNS is blocked by the default policy and
+    # we need to resolve a name in the rules to make it work again. Eg. VPN connections with the
+    # DNS traffic sent to the VPN
+    rules=$(read_rules)
 
     # Flush and set default policies
     do_flush
@@ -131,15 +168,15 @@ do_start()
     ${IPTABLES} --append OUTPUT --jump whitelist
 
     # configure additional firewall rules
-    if [ -r ${RULES_FILE} ] ; then
-        # loop over non-empty non comment lines, this funny construct is needed to not
+    if [ -n "${rules}" ] ; then
+        # loop over all rules, this funny construct is needed to not
         # spawn a subshell. Using a pipe would spawn a subshell. This redirects the output
         # of the grep command into the for loop where it's read line by line.
         # We don't want to spawn a subshell because otherwise the RET global variable can't be
         # set from inside the loop.
         while read line ; do
             add_rule ${line}
-        done < <(grep --extended-regexp --invert-match '^[[:space:]]*(#.*)?$' ${RULES_FILE})
+        done < <(echo "${rules}")
     fi
 
     # Log rejected traffic

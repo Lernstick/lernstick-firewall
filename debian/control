@@ -10,7 +10,7 @@ Vcs-Browser: http://github.com/imedias/lernstick-firewall
 
 Package: lernstick-firewall
 Architecture: all
-Depends: tinyproxy, adduser, lsb-base (>= 3.2-14), ${misc:Depends}
+Depends: tinyproxy, adduser, lsb-base (>= 3.2-14), dnsutils, ${misc:Depends}
 Description: Simple firewall to block network access on workstations
  This firewall blocks all outgoing and incoming connections by
  default. Selected network conections can be allowed with two
