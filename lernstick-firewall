@@ -18,6 +18,9 @@
 # Abort on error
 set -e
 
+# trap to at least implement a block all policy on errors
+trap block_all EXIT
+
 IPTABLES="/sbin/iptables"
 IP6TABLES="/sbin/ip6tables"
 
@@ -34,6 +37,17 @@ PROXY_PORT=$(grep -i '^Port[[:space:]]'  "${PROXY_CONF}" | awk '{print $2}')
 
 # return value
 RET=0
+
+#
+# function to block everything
+#
+# This is used by the exit trap to revert to a sane default state on error
+#
+block_all ()
+{
+    do_flush
+    set_default DROP
+}
 
 #
 # funciton to set the default policy
@@ -197,6 +211,8 @@ case "$1" in
 	exit 3
 	;;
 esac
+
+trap '' EXIT
 
 exit ${RET}
 
