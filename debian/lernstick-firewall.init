@@ -138,7 +138,7 @@ do_reload()
     [ "$VERBOSE" != no ] && log_daemon_msg "Reloading $DESC" "whitelist"
     ${FIREWALL} reload-whitelist || RETVAL="2"
 
-    log_progress_msg "tinyproxy"
+    [ "$VERBOSE" != no ] && log_progress_msg "tinyproxy"
     start-stop-daemon --stop --signal 1 --quiet --pidfile $PIDFILE --name tinyproxy || RETVAL="2"
 
     case "$RETVAL" in
