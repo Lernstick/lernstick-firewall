@@ -214,6 +214,16 @@ do_stop()
 }
 
 #
+# Check status of firewall
+#
+do_status()
+{
+    # Check if the firewall is running. We assume it's running if all policies are set to DROP
+    ${IPTABLES}  -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && \
+	${IP6TABLES} -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && RET=0 || RET=$?
+}
+
+#
 # Reload rules
 #
 do_reload() {
@@ -234,8 +244,11 @@ case "$1" in
   reload)
 	do_reload
 	;;
+  status)
+	do_status
+	;;
   *)
-	echo "Usage: $0 {start|stop|reload}" >&2
+	echo "Usage: $0 {start|stop|reload|status}" >&2
 	exit 3
 	;;
 esac
