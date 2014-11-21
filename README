@@ -28,6 +28,12 @@ The script sets up the following firewall rules:
    destination (hostname, network or IP address) and destination port.
  * Logging of unauthorized access to syslog.
 
+The basic blocking rules and port redirection to tinyproxy are installed
+on system boot by the lernstick-firewall initscript. The network whitelist
+is only loaded after a network connection is established (if-up.d script).
+It's refreshed every time a new connection is established. This is done
+to ensure that DNS name resolution works for the whitelist.
+
 Tinyproxy (https://banu.com/tinyproxy/) is used as a transparent proxy
 to allow access to selected URLs. The proxy is run under a separate
 UID with a lernstick-firewall specific configuration. It does not use
@@ -85,4 +91,4 @@ Example:
 # allow printing to HP JetDirect at printer.local
 tcp printer.local 9100
 
- -- Gaudenz Steinlin <gaudenz@debian.org>  Thu, 06 Sep 2013 15:51:53 +0200
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Fri, 21 Nov 2014 16:09:00 +0200
