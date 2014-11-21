@@ -234,12 +234,8 @@ case "$1" in
   reload)
 	do_reload
 	;;
-  restart)
-	do_stop
-	do_start
-	;;
   *)
-	echo "Usage: $0 {start|stop|reload|restart}" >&2
+	echo "Usage: $0 {start|stop|reload}" >&2
 	exit 3
 	;;
 esac
