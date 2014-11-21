@@ -118,15 +118,21 @@ add_rule ()
 }
 
 #
+# Creates an empty chain if it does not already exist
+#
+# $1 chain name
+create_chain ()
+{
+    if ! ${IPTABLES} --list $1 -n >/dev/null 2>&1 ; then
+        ${IPTABLES} --new-chain $1
+    fi
+}
+
+#
 # Start the firewall
 #
 do_start()
 {
-    # Resolve rules first. This avoids the case where DNS is blocked by the default policy and
-    # we need to resolve a name in the rules to make it work again. Eg. VPN connections with the
-    # DNS traffic sent to the VPN
-    rules=$(read_rules)
-
     # Flush and set default policies
     do_flush
     set_default DROP
@@ -158,21 +164,10 @@ do_start()
     # transparent proxy for port 80
     ${IPTABLES} --table nat --append OUTPUT --protocol tcp --dport http --match owner ! --uid-owner ${PROXY_UID} ! --gid-owner ${PROXY_GID} --jump REDIRECT --to-port ${PROXY_PORT}
 
-    # whitelist rules chain, this chain will always be traversed on OUTPUT
-    ${IPTABLES} --new-chain whitelist
+    # whitelist rules chain, this chain will always be traversed on OUTPUT, create it if it does not exist
+    # the whitelist remains empty if not yet existing or unchanged if it already exists
+    create_chain whitelist
     ${IPTABLES} --append OUTPUT --jump whitelist
-
-    # configure additional firewall rules
-    if [ -n "${rules}" ] ; then
-        # loop over all rules, this funny construct is needed to not
-        # spawn a subshell. Using a pipe would spawn a subshell. This redirects the output
-        # of the grep command into the for loop where it's read line by line.
-        # We don't want to spawn a subshell because otherwise the RET global variable can't be
-        # set from inside the loop.
-        while read line ; do
-            add_rule ${line}
-        done < <(echo "${rules}")
-    fi
 
     # Log rejected traffic
     ${IPTABLES} --append INPUT --jump LOG
@@ -189,10 +184,6 @@ do_flush()
     ${IPTABLES} --flush INPUT
     ${IPTABLES} --flush OUTPUT
     ${IPTABLES} --table nat --flush OUTPUT
-    if ${IPTABLES} --list whitelist -n >/dev/null 2>&1 ; then
-        ${IPTABLES} --flush whitelist
-        ${IPTABLES} --delete-chain whitelist
-    fi
     ${IP6TABLES} --flush INPUT
     ${IP6TABLES} --flush OUTPUT
 }
@@ -224,12 +215,31 @@ do_status()
 }
 
 #
-# Reload rules
+# Reload whitelist rules
 #
-do_reload() {
+do_reload_whitelist() {
 
-    # load new rules
-    do_start
+    create_chain whitelist
+
+    # Resolve rules first. This avoids the case where DNS is blocked by the default policy and
+    # we need to resolve a name in the rules to make it work again. Eg. VPN connections with the
+    # DNS traffic sent to the VPN
+    rules=$(read_rules)
+
+    # Flush whitelist
+    ${IPTABLES} --flush whitelist
+
+    # configure additional firewall rules
+    if [ -n "${rules}" ] ; then
+        # loop over all rules, this funny construct is needed to not
+        # spawn a subshell. Using a pipe would spawn a subshell. This redirects the output
+        # of the grep command into the for loop where it's read line by line.
+        # We don't want to spawn a subshell because otherwise the RET global variable can't be
+        # set from inside the loop.
+        while read line ; do
+            add_rule ${line}
+        done < <(echo "${rules}")
+    fi
 
 	return 0
 }
@@ -241,14 +251,14 @@ case "$1" in
   stop)
 	do_stop
 	;;
-  reload)
-	do_reload
+  reload-whitelist)
+	do_reload_whitelist
 	;;
   status)
 	do_status
 	;;
   *)
-	echo "Usage: $0 {start|stop|reload|status}" >&2
+	echo "Usage: $0 {start|stop|reload-whitelist|status}" >&2
 	exit 3
 	;;
 esac
