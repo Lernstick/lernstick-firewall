@@ -1,3 +1,10 @@
+lernstick-firewall (1.7) unstable; urgency=low
+
+  * updated debian changelog
+  * use NetworkManager dispatcher instead of if-up for reloading whitelist
+
+ -- Ronny Standtke <ronny.standtke@fhnw.ch>  Sat, 22 Nov 2014 17:34:12 +0100
+
 lernstick-firewall (1.6) unstable; urgency=low
 
   [ Gaudenz Steinlin ]
