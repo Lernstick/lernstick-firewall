@@ -1,0 +1,13 @@
+#!/bin/sh -e
+#
+# Reload the Lernstick Firewall Whitelist when interfaces are brought up
+
+if [ -z "$1" ]; then
+    echo "$0: called with no interface" 1>&2
+    exit 1;
+fi
+
+if [ "$2" = "up" ] || [ "$2" = "vpn-up" ]; then
+    /usr/sbin/lernstick-firewall reload-whitelist
+fi
+

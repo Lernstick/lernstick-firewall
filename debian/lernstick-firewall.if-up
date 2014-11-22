@@ -1,3 +1,0 @@
-#!/bin/sh
-
-/usr/sbin/lernstick-firewall reload-whitelist
