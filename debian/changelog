@@ -1,3 +1,15 @@
+lernstick-firewall (1.6) unstable; urgency=low
+
+  [ Gaudenz Steinlin ]
+  * Update standards version to 3.9.6, no changes needed
+  * Remove restart command for firewall (not initscript)
+  * Add status command to lernstick-firewall
+  * Separate start/stop from whitelist
+  * Suppress output if VERBOSE=no
+  * Update README
+
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Sat, 22 Nov 2014 14:14:30 +0100
+
 lernstick-firewall (1.5) unstable; urgency=medium
 
   * [84d9] Function to set default policy
