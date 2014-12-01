@@ -94,10 +94,14 @@ resolve_rule ()
     proto=${1}
     host=${2}
     dport=${3}
-    # resolve hostnames and convert to comma separated list
-    ips=$(dig ${host} +short | grep -Ev '\.$' | tr '\n' ',' | sed -e 's/.$//')
-    # Only use this if there is a result, otherwise use the original host field
-    [ -n "${ips}" ] && host=${ips}
+    if echo $host | grep --extended-regexp --invert-match --quiet '([0-9]{1,3}\.){3}[0-9]{1,3}' ; then
+        # resolve hostnames and convert to comma separated list
+        if out=$(dig ${host} +short) ; then
+            ips=$(echo "$out" | grep --extended-regexp --invert-match '\.$' | tr '\n' ',' | sed -e 's/.$//')
+            # Only use this if there is a result, otherwise use the original host field
+            [ -n "${ips}" ] && host=${ips}
+        fi
+    fi
     # print modified rule
     echo ${proto} ${host} ${dport}
 }
