@@ -91,7 +91,7 @@ is_ipv4 ()
 }
 
 #
-# function to resolv all DNS names in rules first
+# function to resolve all DNS names in rules first
 #
 # This avoids situation where some rules are needed to regain
 # connectivity to the DNS Server (eg. VPN with default route)
@@ -206,11 +206,11 @@ do_flush()
 #
 do_stop()
 {
-	# Return
-	#   0 if daemon has been stopped
-	#   1 if daemon was already stopped
-	#   2 if daemon could not be stopped
-	#   other if a failure occurred
+    # Return
+    #   0 if daemon has been stopped
+    #   1 if daemon was already stopped
+    #   2 if daemon could not be stopped
+    #   other if a failure occurred
 
     # flush rules
     do_flush
@@ -224,7 +224,7 @@ do_status()
 {
     # Check if the firewall is running. We assume it's running if all policies are set to DROP
     ${IPTABLES}  -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && \
-	${IP6TABLES} -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && RET=0 || RET=$?
+    ${IP6TABLES} -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && RET=0 || RET=$?
 }
 
 #
@@ -254,26 +254,26 @@ do_reload_whitelist() {
         done < <(echo "${rules}")
     fi
 
-	return 0
+    return 0
 }
 
 case "$1" in
-  start)
-	do_start
-	;;
-  stop)
-	do_stop
-	;;
-  reload-whitelist)
-	do_reload_whitelist
-	;;
-  status)
-	do_status
-	;;
-  *)
-	echo "Usage: $0 {start|stop|reload-whitelist|status}" >&2
-	exit 3
-	;;
+    start)
+        do_start
+        ;;
+    stop)
+        do_stop
+        ;;
+    reload-whitelist)
+        do_reload_whitelist
+        ;;
+    status)
+        do_status
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|reload-whitelist|status}" >&2
+        exit 3
+        ;;
 esac
 
 trap '' EXIT
