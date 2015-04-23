@@ -1,3 +1,15 @@
+lernstick-firewall (1.9) unstable; urgency=low
+
+  [ Ronny Standtke ]
+  * [b0b2] use function for (stricter) IPv4 check
+  * [d966] simplified ipv4 test function
+  * [cff7] fixed formatting and typo
+
+  [ ronnystandtke ]
+  * [1f0e] don't try to resolve hostnames when querying firewall status
+
+ -- Ronny Standtke <ronny.standtke@fhnw.ch>  Thu, 23 Apr 2015 11:23:26 +0200
+
 lernstick-firewall (1.8) unstable; urgency=medium
 
   * [4391] Revert "use NetworkManager dispatcher instead of if-up for
