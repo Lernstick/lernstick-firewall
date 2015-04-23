@@ -223,8 +223,8 @@ do_stop()
 do_status()
 {
     # Check if the firewall is running. We assume it's running if all policies are set to DROP
-    ${IPTABLES}  -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && \
-    ${IP6TABLES} -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && RET=0 || RET=$?
+    ${IPTABLES}  -n -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && \
+    ${IP6TABLES} -n -L | grep -zqE "Chain INPUT \(policy DROP\).*Chain FORWARD \(policy DROP\).*Chain OUTPUT \(policy DROP\)" && RET=0 || RET=$?
 }
 
 #
