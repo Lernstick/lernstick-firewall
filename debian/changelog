@@ -1,4 +1,4 @@
-lernstick-firewall (1.9) unstable; urgency=low
+lernstick-firewall (1.9) lernstick-8; urgency=low
 
   [ Ronny Standtke ]
   * [b0b2] use function for (stricter) IPv4 check
