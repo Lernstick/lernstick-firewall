@@ -76,7 +76,7 @@ set_default ()
 # means before the all block rule.
 read_rules ()
 {
-    grep --extended-regexp --invert-match '^[[:space:]]*(#.*)?$' ${RULES_FILE} | while read line ; do
+    grep --extended-regexp --invert-match '^[[:space:]]*(#.*)?$' ${1} | while read line ; do
         resolve_rule ${line}
     done
 }
@@ -121,11 +121,14 @@ resolve_rule ()
 # $1 tcp or udp
 # $2 target, hostname, network or ip
 # $3 port
+# $4 direction
 add_rule ()
 {
+    [ "${4}" = 'INPUT' ] &&  match="source" || match="destination"
+
     # Don't fail if an entry ist not resolveable
-    if ! ${IPTABLES} --append whitelist --protocol ${1} --destination ${2} --dport ${3} --jump ACCEPT > /dev/null 2>&1 ; then
-        echo "Setting whitelist for ${1} to ${2} on port ${3} failed." 1>&2
+    if ! ${IPTABLES} --append whitelist_${4} --protocol ${1} --${match} ${2} --dport ${3} --jump ACCEPT > /dev/null 2>&1 ; then
+        echo "Setting whitelist for ${1} to ${2} on port ${3} on chain whitelist_${4} failed." 1>&2
         RET=1
     fi
 }
@@ -150,8 +153,9 @@ do_start()
     do_flush
     set_default DROP
 
-    # allow incoming related packages
+    # allow related packages
     ${IPTABLES} --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
 
     # allow all connections to and from localhost, even for IPv6
     ${IPTABLES} --append INPUT --in-interface lo --destination 127.0.0.0/8 --jump ACCEPT
@@ -179,8 +183,10 @@ do_start()
 
     # whitelist rules chain, this chain will always be traversed on OUTPUT, create it if it does not exist
     # the whitelist remains empty if not yet existing or unchanged if it already exists
-    create_chain whitelist
-    ${IPTABLES} --append OUTPUT --jump whitelist
+    for wl in OUTPUT INPUT ; do
+        create_chain whitelist_${wl}
+        ${IPTABLES} --append ${wl} --jump whitelist_${wl}
+    done
 
     # Log rejected traffic
     ${IPTABLES} --append INPUT --jump LOG
@@ -230,17 +236,19 @@ do_status()
 #
 # Reload whitelist rules
 #
+# $1 INPUT or OUTPUT
 do_reload_whitelist() {
 
-    create_chain whitelist
+    create_chain whitelist_$1
 
     # Resolve rules first. This avoids the case where DNS is blocked by the default policy and
     # we need to resolve a name in the rules to make it work again. Eg. VPN connections with the
     # DNS traffic sent to the VPN
-    rules=$(read_rules)
+    filevar="RULES_FILE_${1}"
+    rules=$(read_rules ${!filevar})
 
     # Flush whitelist
-    ${IPTABLES} --flush whitelist
+    ${IPTABLES} --flush whitelist_$1
 
     # configure additional firewall rules
     if [ -n "${rules}" ] ; then
@@ -250,7 +258,7 @@ do_reload_whitelist() {
         # We don't want to spawn a subshell because otherwise the RET global variable can't be
         # set from inside the loop.
         while read line ; do
-            add_rule ${line}
+            add_rule ${line} $1
         done < <(echo "${rules}")
     fi
 
@@ -265,7 +273,9 @@ case "$1" in
         do_stop
         ;;
     reload-whitelist)
-        do_reload_whitelist
+	for wl in OUTPUT INPUT ; do
+            do_reload_whitelist $wl
+        done
         ;;
     status)
         do_status
