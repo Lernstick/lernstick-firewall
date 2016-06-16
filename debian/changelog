@@ -1,3 +1,11 @@
+lernstick-firewall (1.10) lernstick-8; urgency=medium
+
+  * [1f915d] Add whitelist for incoming connections
+  * [f53b9a] Update standards version to 3.9.8 (no changes)
+  * [eae439] Fix spelling error in package description
+
+ -- Gaudenz Steinlin <gaudenz@debian.org>  Thu, 16 Jun 2016 17:09:25 +0200
+
 lernstick-firewall (1.9) lernstick-8; urgency=low
 
   [ Ronny Standtke ]
