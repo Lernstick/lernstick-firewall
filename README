@@ -3,7 +3,7 @@ Simple firewall to block network access on workstations
 
 This firewall blocks all outgoing and incoming connections by
 default. Selected network conections can be allowed with two
-whitelists. One for HTTP (Web) URLs and another for network
+whitelists. One for HTTP/S (Web) URLs and another for network
 connections.
 
 This firewall script was originally developed to allow selected
@@ -22,22 +22,23 @@ The script sets up the following firewall rules:
 
  * Blocking all connections by default
  * Allow outgoing DNS traffic to enable name resolution
- * Redirection of all connections to port 80 to a transparent proxy.
+ * Redirection of all connections to port 80/443 to a transparent proxy.
    The proxy does not allow any URLs by default.
  * Whitelist to allow additional connections by protocol (TCP or UDP),
    destination (hostname, network or IP address) and destination port.
  * Logging of unauthorized access to syslog.
 
-The basic blocking rules and port redirection to tinyproxy are installed
+The basic blocking rules and port redirection to squid are installed
 on system boot by the lernstick-firewall initscript. The network whitelist
 is only loaded after a network connection is established (if-up.d script).
 It's refreshed every time a new connection is established. This is done
 to ensure that DNS name resolution works for the whitelist.
 
-Tinyproxy (https://banu.com/tinyproxy/) is used as a transparent proxy
+Squid (http://squid-cache.org) is used as a transparent proxy
 to allow access to selected URLs. The proxy is run under a separate
 UID with a lernstick-firewall specific configuration. It does not use
-the standard tinyproxy configuration and init script.
+the standard squid configuration and init script. lernstick-firewall
+deactivates the squid init script upon installation.
 
 ** Configuration **
 
@@ -48,31 +49,28 @@ All configuration files are in /etc/lernstick-firewall.
 Main configuration file to set proxy port, proxy uid and whitelist
 file locations.
 
-*** tinyproxy.conf ***
+*** squid.conf ***
 
-Configuration for tinyproxy. See man tinyproxy.conf for details. But
-be aware that changeing settings in this file might weaken the
-security of the firewall.
+Configuration for squid. Be aware that changing settings in this file
+might weaken the security of the firewall.
 
 *** url_whitelist ***
 
 Whitelist file to allow access to selected URLs. One URL per line.
 Matching is done with regular expressions. Only parts of the URL have
 to match. If you want to match the full URL, prepend your pattern with
-"^http://". You have to specify the TCP port for in the URL (usually
-80) even if you don't enter this as part of the URL in your browser
-(see examples below). Matching is done case insensitive by default.
-This can be changed in tinyproxy.conf.
+Matching is done case insensitive by default.
+This can be changed in squid.conf.
 
 Examples:
 Allow everything about firewalls on wikipedia. This also allows
 http://en.wikipedia.org/wiki/Firewall_(computing).
 
-    ^http://en.wikipedia.org:80/wiki/Firewall
+    ^http://en.wikipedia.org/wiki/Firewall
 
 Allow only one exact URL
 
-    ^http://en.wikipedia.org:80/wiki/Firewall$
+    ^http://en.wikipedia.org/wiki/Firewall$
     
 Allow everything that contains the word firewall:
 
@@ -91,4 +89,10 @@ Example:
 # allow printing to HP JetDirect at printer.local
 tcp printer.local 9100
 
- -- Gaudenz Steinlin <gaudenz@debian.org>  Fri, 21 Nov 2014 16:09:00 +0200
+*** ca.pem ***
+
+Certificate and private key of the CA that squid uses for generating 
+certificates. This certificate is valid for 30000 days which might be changed
+by generating a new one.
+
+ -- Tiago Santos <tiago.santos@students.fhnw.ch>  Fri, 21 Mar 2017 16:09:00 +0200

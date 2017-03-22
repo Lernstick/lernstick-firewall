@@ -1,3 +1,9 @@
+lernstick-firewall (2.0) lernstick-8; urgency=high
+
+  * Commit will come after testing this package
+
+ -- Tiago Santos <tiago.santos@students.fhnw.ch>  Wed, 15 Mar 2017 20:59:22 +0100
+
 lernstick-firewall (1.10) lernstick-8; urgency=medium
 
   * [1f915d] Add whitelist for incoming connections

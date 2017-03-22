@@ -34,7 +34,7 @@ if [ "$1" = "configure" ]; then
     # fix configfile permissions, keep admin overrides
     confdir="/etc/lernstick-firewall"
     conffiles="${confdir}/lernstick-firewall.conf
-               ${confdir}/tinyproxy.conf
+               ${confdir}/squid.conf
                ${confdir}/url_whitelist
                ${confdir}/net_whitelist"
     for cf in ${conffiles}; do
@@ -42,6 +42,10 @@ if [ "$1" = "configure" ]; then
             dpkg-statoverride --update --add root ${username} 0640 ${cf}
         fi
     done
+
+    # disable squid from starting its own service and stop it if it's already running
+    update-rc.d squid disable
+    /etc/init.d/squid stop
 fi
 
 #DEBHELPER#
