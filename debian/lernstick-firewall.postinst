@@ -46,6 +46,9 @@ if [ "$1" = "configure" ]; then
     # disable squid from starting its own service and stop it if it's already running
     update-rc.d squid disable
     /etc/init.d/squid stop
+
+    # install ca to local ca db
+    update-ca-certificates
 fi
 
 #DEBHELPER#

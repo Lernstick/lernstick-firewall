@@ -1,6 +1,12 @@
+lernstick-firewall (2.1) lernstick-8; urgency=low
+
+  * Added installation of ca to debian ca-certificate database
+
+ -- Tiago Santos <tiago.santos@students.fhnw.ch>  Tue, 30 May 2017 20:59:22 +0200
+
 lernstick-firewall (2.0) lernstick-8; urgency=high
 
-  * Commit will come after testing this package
+  * Added squid, all needed dependencies set, scripts changed
 
  -- Tiago Santos <tiago.santos@students.fhnw.ch>  Wed, 15 Mar 2017 20:59:22 +0100
 
