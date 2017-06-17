@@ -2,10 +2,21 @@
 CERTNAME="Lernstick Firewall"
 CERTFILE="/etc/lernstick-firewall/ca.pem"
 
+PREFERENCES=$(find ~/.mozilla/firefox/* -name "prefs.js" 2>/dev/null)
+
+if [ -z "${PREFERENCES}" ]
+then
+	# there is no firefox profile yet
+	# let's create one now
+	firefox -CreateProfile default
+	PREFERENCES=$(find ~/.mozilla/firefox/* -name "prefs.js" 2>/dev/null)
+fi
+
 # Install cert in firefox
-for certdb in $(find ~/.mozilla/firefox/* -name "cert8.db")
+for PREFERENCE in ${PREFERENCES}
 do
-	certdir="$(dirname ${certdb})"
-	certutil -D -n "$CERTNAME" -d "${certdir}"
-	certutil -A -n "$CERTNAME" -t "TCu,Cuw,Tuw" -i "${CERTFILE}" -d "${certdir}"
+	PROFILE_DIR="$(dirname ${PREFERENCE})"
+	echo "updating Lernstick firewall certificate in profile ${PROFILE_DIR}"
+	certutil -D -n "$CERTNAME" -d "${PROFILE_DIR}"
+	certutil -A -n "$CERTNAME" -t "TCu,Cuw,Tuw" -i "${CERTFILE}" -d "${PROFILE_DIR}"
 done
