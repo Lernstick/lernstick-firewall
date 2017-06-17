@@ -10,12 +10,16 @@
 override_dh_install:
 	dh_auto_install
 	install -D -o root -g root -m 755 lernstick-firewall debian/lernstick-firewall/usr/sbin/lernstick-firewall
-	for f in lernstick-firewall.conf url_whitelist net_whitelist tinyproxy.conf ; do \
+	for f in lernstick-firewall.conf url_whitelist net_whitelist squid.conf ca.pem ; do \
 		install -D -o root -g root -m 640 $$f debian/lernstick-firewall/etc/lernstick-firewall/$$f ; \
 	done
+	install -D -o root -g root -m 640 ca.crt debian/lernstick-firewall/usr/local/share/ca-certificates/lernstick-firewall.crt
 
 override_dh_fixperms:
 	dh_fixperms --exclude /etc/lernstick-firewall
 
 override_dh_installinit:
 	dh_installinit --restart-after-upgrade
+
+override_dh_usrlocal:
+

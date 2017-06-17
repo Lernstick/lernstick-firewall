@@ -23,17 +23,16 @@ trap block_all EXIT
 
 IPTABLES="/sbin/iptables"
 IP6TABLES="/sbin/ip6tables"
+PROXY_UID=proxy
+PROXY_GID=proxy
+PROXY_PORT_DIRECT=3127
+PROXY_PORT_HTTP=3128
+PROXY_PORT_HTTPS=3129
+CERTNAME="Lernstick Firewall"
+CERTFILE="/etc/lernstick-firewall/ca.pem"
 
 # Read configuration variable file if it is present
 [ -r /etc/lernstick-firewall/lernstick-firewall.conf ] && . /etc/lernstick-firewall/lernstick-firewall.conf
-
-# Parse tinyproxy configuration file, use standard config file if
-# PROXY_CONF is not set
-[ -z ${PROXY_CONF} ] && PROXY_CONF="/etc/tinyproxy.conf"
-
-PROXY_UID=$(grep  -i '^User[[:space:]]'  "${PROXY_CONF}" | awk '{print $2}')
-PROXY_GID=$(grep  -i '^Group[[:space:]]' "${PROXY_CONF}" | awk '{print $2}')
-PROXY_PORT=$(grep -i '^Port[[:space:]]'  "${PROXY_CONF}" | awk '{print $2}')
 
 # return value
 RET=0
@@ -173,13 +172,44 @@ do_start()
     ${IPTABLES} --append OUTPUT --protocol udp --dport domain --jump ACCEPT
 
     # access to local proxy
-    ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT_HTTPS} --jump ACCEPT
 
-    # allow outgoing traffic for proxy to port 80 on any server
-    ${IPTABLES} --append OUTPUT --protocol tcp --dport http --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
+    # allow outgoing traffic for proxy to port 80 and 443 on any server
+    ${IPTABLES} --append OUTPUT --protocol tcp --dport 80 --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol tcp --dport 443 --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
 
-    # transparent proxy for port 80
-    ${IPTABLES} --table nat --append OUTPUT --protocol tcp --dport http --match owner ! --uid-owner ${PROXY_UID} ! --gid-owner ${PROXY_GID} --jump REDIRECT --to-port ${PROXY_PORT}
+    # Setup NAT forwarding of port 80 and 443 to squid
+    ${IPTABLES} -t nat -A OUTPUT -p tcp --dport 80 -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTP}
+    ${IPTABLES} -t nat -A OUTPUT -p tcp --dport 443 -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTPS}
+
+    # Regenerate CA cert
+    #openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 -extensions v3_ca \
+    #       -keyout /etc/lernstick-firewall/ca.pem \
+    #       -out /etc/lernstick-firewall/ca.pem \
+    #       -subj '/C=CH/ST=Aargau/L=Windisch/O=FHNW/OU=Imedias/CN=Lernstick'
+
+    # Generate certdb if on new system
+    rm -rf $HOME/.pki
+    mkdir -p $HOME/.pki/nssdb
+    echo "AO+IOJ!jr6s" > $HOME/.pki/pw
+    certutil -d $HOME/.pki/nssdb -N -f $HOME/.pki/pw
+    rm -f $HOME/.pki/pw
+
+    # Install cert in firefox
+    for certdb in $(find /home/*/.mozilla* -name "cert8.db")
+    do
+        certdir=$(dirname ${certdb});
+        certutil -D -n $CERTNAME -d ${certdir} || :
+        certutil -A -n $CERTNAME -t "TCu,Cuw,Tuw" -i ${CERTFILE} -d ${certdir} || :
+    done
+
+    # Recreate dynamic SSL cert DB
+    rm -rf /var/lib/squid/ssl_db
+    mkdir -p /var/lib/squid
+    /usr/lib/squid/ssl_crtd -c -s /var/lib/squid/ssl_db
+    chown proxy:proxy -R /var/lib/squid/ssl_db
 
     # whitelist rules chain, this chain will always be traversed on OUTPUT, create it if it does not exist
     # the whitelist remains empty if not yet existing or unchanged if it already exists
@@ -205,6 +235,9 @@ do_flush()
     ${IPTABLES} --table nat --flush OUTPUT
     ${IP6TABLES} --flush INPUT
     ${IP6TABLES} --flush OUTPUT
+
+    # Remove the NAT redirection rules to have full access without squid
+    ${IPTABLES} -t nat -F
 }
 
 #
