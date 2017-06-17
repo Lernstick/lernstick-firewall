@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Version=1.0
+Name=Install Lernstick firewall certificate in Firefox
+Name[de_DE]=Lernstick-Firewall-Zertifikat in Firefox installieren
+Exec=lernstick-install-certificate
+X-GNOME-Autostart-enabled=true

@@ -1,0 +1,11 @@
+#!/bin/sh
+CERTNAME="Lernstick Firewall"
+CERTFILE="/etc/lernstick-firewall/ca.pem"
+
+# Install cert in firefox
+for certdb in $(find ~/.mozilla/firefox/* -name "cert8.db")
+do
+	certdir="$(dirname ${certdb})"
+	certutil -D -n "$CERTNAME" -d "${certdir}"
+	certutil -A -n "$CERTNAME" -t "TCu,Cuw,Tuw" -i "${CERTFILE}" -d "${certdir}"
+done
