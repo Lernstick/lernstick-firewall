@@ -1,5 +1,5 @@
 #!/bin/sh
 
-[ "$METHOD" != "loopback" -a "$METHOD" != "none" ] && /usr/sbin/lernstick-firewall reload-whitelist
+[ "$METHOD" != "loopback" -a "$METHOD" != "none" ] && /etc/init.d/lernstick-firewall reload
 
 exit 0
