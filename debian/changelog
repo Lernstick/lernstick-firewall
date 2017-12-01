@@ -1,3 +1,10 @@
+lernstick-firewall (2.6) lernstick-8; urgency=medium
+
+  * [a0d963] updated .gitignore file
+  * [1f631d] allow NTP requests
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Fri, 01 Dec 2017 19:30:55 +0100
+
 lernstick-firewall (2.5) lernstick-8; urgency=medium
 
   * [071c56] added rule to allow DHCP lease renewal, replaced port numbers with service names, some spelling fixes
