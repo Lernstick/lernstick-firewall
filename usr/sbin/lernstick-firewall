@@ -172,6 +172,9 @@ do_start()
     # allow DHCP lease renewal
     ${IPTABLES} --append OUTPUT --protocol udp --sport bootpc --dport bootps --jump ACCEPT
 
+    # allow NTP requests
+    ${IPTABLES} --append OUTPUT --protocol udp --sport ntp --dport ntp --jump ACCEPT
+
     # access to local proxy
     ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
     ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
