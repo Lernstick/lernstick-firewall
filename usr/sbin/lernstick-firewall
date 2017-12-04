@@ -169,6 +169,10 @@ do_start()
     # allow outgoing DNS traffic
     ${IPTABLES} --append OUTPUT --protocol udp --dport domain --jump ACCEPT
 
+    # allow outgoing Multicast DNS
+    ${IPTABLES} --append OUTPUT --protocol udp --destination 224.0.0.251 --dport mdns --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol udp --destination ff02::fb --dport mdns --jump ACCEPT
+
     # allow DHCP lease renewal
     ${IPTABLES} --append OUTPUT --protocol udp --sport bootpc --dport bootps --jump ACCEPT
 
