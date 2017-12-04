@@ -1,3 +1,9 @@
+lernstick-firewall (2.7) lernstick-8; urgency=medium
+
+  * [3dde20] allow outgoing Multicast DNS
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Mon, 04 Dec 2017 20:46:33 +0100
+
 lernstick-firewall (2.6) lernstick-8; urgency=medium
 
   * [a0d963] updated .gitignore file
