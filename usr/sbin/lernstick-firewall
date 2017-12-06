@@ -166,6 +166,9 @@ do_start()
     # ICMP traffic to other hosts is not sent out of loopback and not allowed by this rule.
     ${IPTABLES} --append OUTPUT --out-interface lo --protocol ICMP --jump ACCEPT
 
+    # allow echo requests
+    ${IPTABLES} --append OUTPUT --protocol ICMP --icmp-type echo-request -j ACCEPT
+
     # allow outgoing DNS traffic
     ${IPTABLES} --append OUTPUT --protocol udp --dport domain --jump ACCEPT
 
