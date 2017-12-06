@@ -181,7 +181,10 @@ do_start()
     ${IP6TABLES} --append OUTPUT --protocol UDP --destination ff02::fb --dport mdns --jump ACCEPT
 
     # allow DHCP lease renewal
+    ${IPTABLES} --append INPUT --protocol UDP --sport bootps --dport bootpc --jump ACCEPT
     ${IPTABLES} --append OUTPUT --protocol UDP --sport bootpc --dport bootps --jump ACCEPT
+    ${IP6TABLES} --append INPUT --protocol UDP --sport bootps --dport bootpc --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol UDP --sport bootpc --dport bootps --jump ACCEPT
 
     # allow NTP requests
     ${IPTABLES} --append OUTPUT --protocol UDP --sport ntp --dport ntp --jump ACCEPT
