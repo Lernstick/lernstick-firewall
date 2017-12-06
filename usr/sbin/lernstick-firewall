@@ -234,6 +234,7 @@ do_start()
 
     # reject local outgoing pakets instead of just dropping
     ${IPTABLES} --append OUTPUT --jump REJECT
+    ${IP6TABLES} --append OUTPUT --jump REJECT
 }
 
 # Flush firewall rules
