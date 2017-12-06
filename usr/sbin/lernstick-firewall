@@ -92,7 +92,7 @@ is_ipv4 ()
 #
 # This avoids situation where some rules are needed to regain
 # connectivity to the DNS Server (eg. VPN with default route)
-# $1 tcp or udp
+# $1 TCP or UDP
 # $2 target, hostname, network or ip
 # $3 port
 resolve_rule ()
@@ -115,7 +115,7 @@ resolve_rule ()
 #
 # function to add a rule to the whitelist
 #
-# $1 tcp or udp
+# $1 TCP or UDP
 # $2 target, hostname, network or ip
 # $3 port
 # $4 direction
@@ -168,39 +168,36 @@ do_start()
     ${IP6TABLES} --append INPUT --protocol IPv6-ICMP -j ACCEPT
     ${IP6TABLES} --append OUTPUT --protocol IPv6-ICMP -j ACCEPT
 
-    # allow echo requests
-    ${IPTABLES} --append OUTPUT --protocol ICMP --icmp-type echo-request -j ACCEPT
-
     # allow outgoing DNS traffic
-    ${IPTABLES} --append OUTPUT --protocol udp --dport domain --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol UDP --dport domain --jump ACCEPT
 
     # allow IGMP membership reports
     ${IPTABLES} --append OUTPUT --protocol IGMP --destination 224.0.0.22 --jump ACCEPT
 
     # allow Multicast DNS
-    ${IPTABLES} --append INPUT --protocol udp --destination 224.0.0.251 --dport mdns --jump ACCEPT
-    ${IP6TABLES} --append INPUT --protocol udp --destination ff02::fb --dport mdns --jump ACCEPT
-    ${IPTABLES} --append OUTPUT --protocol udp --destination 224.0.0.251 --dport mdns --jump ACCEPT
-    ${IP6TABLES} --append OUTPUT --protocol udp --destination ff02::fb --dport mdns --jump ACCEPT
+    ${IPTABLES} --append INPUT --protocol UDP --destination 224.0.0.251 --dport mdns --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol UDP --destination 224.0.0.251 --dport mdns --jump ACCEPT
+    ${IP6TABLES} --append INPUT --protocol UDP --destination ff02::fb --dport mdns --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol UDP --destination ff02::fb --dport mdns --jump ACCEPT
 
     # allow DHCP lease renewal
-    ${IPTABLES} --append OUTPUT --protocol udp --sport bootpc --dport bootps --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol UDP --sport bootpc --dport bootps --jump ACCEPT
 
     # allow NTP requests
-    ${IPTABLES} --append OUTPUT --protocol udp --sport ntp --dport ntp --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol UDP --sport ntp --dport ntp --jump ACCEPT
 
     # access to local proxy
-    ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
-    ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
-    ${IPTABLES} --append OUTPUT --protocol tcp --destination 127.0.0.1 --dport ${PROXY_PORT_HTTPS} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_HTTPS} --jump ACCEPT
 
     # allow outgoing traffic for proxy to http and https on any server
-    ${IPTABLES} --append OUTPUT --protocol tcp --dport http --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
-    ${IPTABLES} --append OUTPUT --protocol tcp --dport https --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol TCP --dport http --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol TCP --dport https --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
 
     # setup NAT forwarding of http and https to squid
-    ${IPTABLES} -t nat -A OUTPUT -p tcp --dport http -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTP}
-    ${IPTABLES} -t nat -A OUTPUT -p tcp --dport https -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTPS}
+    ${IPTABLES} -t nat -A OUTPUT -p TCP --dport http -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTP}
+    ${IPTABLES} -t nat -A OUTPUT -p TCP --dport https -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTPS}
 
     # Regenerate CA cert
     #openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 -extensions v3_ca \
