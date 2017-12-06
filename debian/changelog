@@ -1,3 +1,10 @@
+lernstick-firewall (2.10) lernstick-8; urgency=medium
+
+  * [ab9b38] also log IPv6 packages that not matched the rules
+  * [383224] reject all non-whitelisted IPv6 traffic
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Wed, 06 Dec 2017 13:03:56 +0100
+
 lernstick-firewall (2.9) lernstick-8; urgency=medium
 
   * [bc84af] allow incoming Multicast DNS
