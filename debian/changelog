@@ -1,3 +1,9 @@
+lernstick-firewall (2.12) lernstick-8; urgency=medium
+
+  * [d21f81] allow *all* DHCP lease renewal traffic (in,out,IPv4,IPv6)
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Wed, 06 Dec 2017 15:02:05 +0100
+
 lernstick-firewall (2.11) lernstick-8; urgency=medium
 
   * [e246ae] allow all ICMP (v4 and v6)
