@@ -175,7 +175,9 @@ do_start()
     # allow IGMP membership reports
     ${IPTABLES} --append OUTPUT --protocol IGMP --destination 224.0.0.22 --jump ACCEPT
 
-    # allow outgoing Multicast DNS
+    # allow Multicast DNS
+    ${IPTABLES} --append INPUT --protocol udp --destination 224.0.0.251 --dport mdns --jump ACCEPT
+    ${IP6TABLES} --append INPUT --protocol udp --destination ff02::fb --dport mdns --jump ACCEPT
     ${IPTABLES} --append OUTPUT --protocol udp --destination 224.0.0.251 --dport mdns --jump ACCEPT
     ${IP6TABLES} --append OUTPUT --protocol udp --destination ff02::fb --dport mdns --jump ACCEPT
 
