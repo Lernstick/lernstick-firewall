@@ -1,3 +1,10 @@
+lernstick-firewall (2.8) lernstick-8; urgency=medium
+
+  * [7f7fd3] allow echo requests
+  * [1c125d] allow IGMP membership reports
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Wed, 06 Dec 2017 10:42:56 +0100
+
 lernstick-firewall (2.7) lernstick-8; urgency=medium
 
   * [3dde20] allow outgoing Multicast DNS
