@@ -1,3 +1,11 @@
+lernstick-firewall (2.11) lernstick-8; urgency=medium
+
+  * [e246ae] allow all ICMP (v4 and v6)
+  * [f26db0] allow established and related incoming IPv6 traffic
+  * [8cd76b] code cleanup
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Wed, 06 Dec 2017 14:26:54 +0100
+
 lernstick-firewall (2.10) lernstick-8; urgency=medium
 
   * [ab9b38] also log IPv6 packages that not matched the rules
