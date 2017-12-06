@@ -153,6 +153,8 @@ do_start()
     # allow related packages
     ${IPTABLES} --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
     ${IPTABLES} --append OUTPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+    ${IP6TABLES} --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
 
     # allow all connections to and from localhost, even for IPv6
     ${IPTABLES} --append INPUT --in-interface lo --destination 127.0.0.0/8 --jump ACCEPT
