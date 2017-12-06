@@ -226,9 +226,11 @@ do_start()
         ${IPTABLES} --append ${wl} --jump whitelist_${wl}
     done
 
-    # log rejected traffic
+    # log everything that passed the rules above
     ${IPTABLES} --append INPUT --jump LOG
     ${IPTABLES} --append OUTPUT --jump LOG
+    ${IP6TABLES} --append INPUT --jump LOG
+    ${IP6TABLES} --append OUTPUT --jump LOG
 
     # reject local outgoing pakets instead of just dropping
     ${IPTABLES} --append OUTPUT --jump REJECT
