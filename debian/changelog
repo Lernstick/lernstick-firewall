@@ -1,3 +1,9 @@
+lernstick-firewall (2.13) lernstick-8; urgency=medium
+
+  * [9331f2] allow incoming broadcasts
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Fri, 22 Dec 2017 10:47:54 +0100
+
 lernstick-firewall (2.12) lernstick-8; urgency=medium
 
   * [d21f81] allow *all* DHCP lease renewal traffic (in,out,IPv4,IPv6)
