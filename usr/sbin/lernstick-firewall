@@ -146,6 +146,7 @@ create_chain ()
 #
 do_start()
 {
+    logger -t lernstick-firewall "setting default policies"
     # Flush and set default policies
     do_flush
     set_default DROP

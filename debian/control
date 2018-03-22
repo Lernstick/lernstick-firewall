@@ -1,8 +1,8 @@
 Source: lernstick-firewall
 Section: net
 Priority: extra
-Maintainer: Gaudenz Steinlin <gaudenz@debian.org>
-Build-Depends: debhelper (>= 8.0.0)
+Maintainer: Ronny Standtke <ronny.standtke@gmx.net>
+Build-Depends: debhelper (>= 10.0.0)
 Standards-Version: 3.9.8
 Homepage: http://github.com/imedias/lernstick-firewall
 Vcs-Git: git://github.com/imedias/lernstick-firewall.git

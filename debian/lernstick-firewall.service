@@ -1,0 +1,12 @@
+[Unit]
+Description=The Lernstick firewall
+DefaultDependencies=no
+Before=basic.target dbus-org.freedesktop.nm-dispatcher.service
+
+[Service]
+Type=forking
+ExecStart=/lib/systemd/lernstick-firewall start
+ExecStop=/lib/systemd/lernstick-firewall stop
+
+[Install]
+WantedBy=basic.target
