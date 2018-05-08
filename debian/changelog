@@ -1,3 +1,9 @@
+lernstick-firewall (2.16) lernstick-9; urgency=medium
+
+  * [e88555] allow all IGMP traffic
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Tue, 08 May 2018 22:40:07 +0200
+
 lernstick-firewall (2.15) lernstick-9; urgency=medium
 
   * [799dff] made rule for allowing incoming broadcasts more generic
