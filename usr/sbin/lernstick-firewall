@@ -170,7 +170,7 @@ do_start()
     ${IP6TABLES} --append OUTPUT --protocol IPv6-ICMP -j ACCEPT
 
     # allow incoming broadcasts
-    ${IPTABLES} --append INPUT --destination 255.255.255.255 --jump ACCEPT
+    ${IPTABLES} --append INPUT -m pkttype --pkt-type broadcast --jump ACCEPT
 
     # allow outgoing DNS traffic
     ${IPTABLES} --append OUTPUT --protocol UDP --dport domain --jump ACCEPT
