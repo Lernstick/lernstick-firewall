@@ -169,14 +169,15 @@ do_start()
     ${IP6TABLES} --append INPUT --protocol IPv6-ICMP -j ACCEPT
     ${IP6TABLES} --append OUTPUT --protocol IPv6-ICMP -j ACCEPT
 
+    # allow IGMP
+    ${IPTABLES} --append INPUT --protocol IGMP --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol IGMP --jump ACCEPT
+
     # allow incoming broadcasts
     ${IPTABLES} --append INPUT -m pkttype --pkt-type broadcast --jump ACCEPT
 
     # allow outgoing DNS traffic
     ${IPTABLES} --append OUTPUT --protocol UDP --dport domain --jump ACCEPT
-
-    # allow IGMP membership reports
-    ${IPTABLES} --append OUTPUT --protocol IGMP --destination 224.0.0.22 --jump ACCEPT
 
     # allow Multicast DNS
     ${IPTABLES} --append INPUT --protocol UDP --destination 224.0.0.251 --dport mdns --jump ACCEPT
