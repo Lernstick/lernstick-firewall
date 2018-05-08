@@ -193,6 +193,12 @@ do_start()
     # allow NTP requests
     ${IPTABLES} --append OUTPUT --protocol UDP --sport ntp --dport ntp --jump ACCEPT
 
+    # allow DHCPv6
+    ${IP6TABLES} --append INPUT --protocol UDP --dport dhcpv6-client --jump ACCEPT
+    ${IP6TABLES} --append INPUT --protocol TCP --dport dhcpv6-client --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol UDP --dport dhcpv6-server --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol TCP --dport dhcpv6-server --jump ACCEPT
+
     # access to local proxy
     ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
     ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
