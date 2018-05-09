@@ -1,3 +1,9 @@
+lernstick-firewall (2.17) lernstick-9; urgency=medium
+
+  * [81afb1] allow CUPS printer probes
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Wed, 09 May 2018 10:22:39 +0200
+
 lernstick-firewall (2.16) lernstick-9; urgency=medium
 
   * [e88555] allow all IGMP traffic
