@@ -200,6 +200,17 @@ do_start()
     ${IP6TABLES} --append OUTPUT --protocol UDP --dport dhcpv6-server --jump ACCEPT
     ${IP6TABLES} --append OUTPUT --protocol TCP --dport dhcpv6-server --jump ACCEPT
 
+    # allow some CUPS printer probes:
+    # Canon (Port 8610: MFNP Service, Port 8612: BJNP Port 2)
+    ${IPTABLES} --append OUTPUT  --protocol UDP --sport 8612 --dport 8610 --jump ACCEPT
+    ${IPTABLES} --append OUTPUT  --protocol UDP --sport 8612 --dport 8612 --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT  --protocol UDP --destination ff02::/16 --sport 8612 --dport 8610 --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT  --protocol UDP --destination ff02::/16 --sport 8612 --dport 8612 --jump ACCEPT
+    # some Samsung printers
+    ${IPTABLES} --append OUTPUT  --protocol UDP --destination 255.255.255.255 --dport 1124 --jump ACCEPT
+    # Epson ENPC
+    ${IPTABLES} --append OUTPUT  --protocol UDP --destination 255.255.255.255 --dport 3289 --jump ACCEPT
+
     # access to local proxy
     ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
     ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
