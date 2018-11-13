@@ -17,6 +17,6 @@ for PREFERENCE in ${PREFERENCES}
 do
 	PROFILE_DIR="$(dirname ${PREFERENCE})"
 	echo "updating Lernstick firewall certificate in profile ${PROFILE_DIR}"
-	certutil -D -n "$CERTNAME" -d "${PROFILE_DIR}"
-	certutil -A -n "$CERTNAME" -t "TCu,Cuw,Tuw" -i "${CERTFILE}" -d "${PROFILE_DIR}"
+	certutil -D -n "$CERTNAME" -d "sql:${PROFILE_DIR}"
+	certutil -A -n "$CERTNAME" -t "TCu,Cuw,Tuw" -i "${CERTFILE}" -d "sql:${PROFILE_DIR}" 
 done
