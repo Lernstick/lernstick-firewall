@@ -1,3 +1,9 @@
+lernstick-firewall (2.19) lernstick-9; urgency=medium
+
+  * [904e87] create an initial empty certificate database
+
+ -- Ronny <ronny.standtke@gmx.net>  Tue, 13 Nov 2018 12:09:29 +0100
+
 lernstick-firewall (2.18) lernstick-9; urgency=medium
 
   * [688038] use "sql:" prefix when calling certutil to enforce using the newer
