@@ -1,3 +1,9 @@
+lernstick-firewall (2.20) lernstick-10; urgency=medium
+
+  * [e1fb1e] updated to Squid 4.8 (Debian 10)
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Fri, 27 Sep 2019 23:12:27 +0200
+
 lernstick-firewall (2.19) lernstick-9; urgency=medium
 
   * [904e87] create an initial empty certificate database
