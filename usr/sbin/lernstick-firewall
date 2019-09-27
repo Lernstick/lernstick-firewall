@@ -240,7 +240,7 @@ do_start()
     # Recreate dynamic SSL cert DB
     rm -rf /var/lib/squid/ssl_db
     mkdir -p /var/lib/squid
-    /usr/lib/squid/ssl_crtd -c -s /var/lib/squid/ssl_db
+    /usr/lib/squid/security_file_certgen -c -s /var/lib/squid/ssl_db -M 500MB
     chown proxy:proxy -R /var/lib/squid/ssl_db
 
     # whitelist rules chain, this chain will always be traversed on OUTPUT, create it if it does not exist
