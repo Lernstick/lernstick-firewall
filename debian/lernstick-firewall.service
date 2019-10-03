@@ -7,6 +7,7 @@ Before=basic.target dbus-org.freedesktop.nm-dispatcher.service
 Type=forking
 ExecStart=/lib/systemd/lernstick-firewall start
 ExecStop=/lib/systemd/lernstick-firewall stop
+ExecReload=/lib/systemd/lernstick-firewall reload
 
 [Install]
 WantedBy=basic.target
