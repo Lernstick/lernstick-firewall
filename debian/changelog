@@ -1,3 +1,10 @@
+lernstick-firewall (2.21) lernstick-10; urgency=medium
+
+  * [133e27] allow reload via systemctl
+  * [2c2799] updated gbp.conf
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Thu, 03 Oct 2019 15:33:22 +0200
+
 lernstick-firewall (2.20) lernstick-10; urgency=medium
 
   * [e1fb1e] updated to Squid 4.8 (Debian 10)
