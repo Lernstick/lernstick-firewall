@@ -2,18 +2,40 @@
 
 CERTNAME="Lernstick Firewall"
 CERTFILE="/etc/lernstick-firewall/ca.pem"
-
-PREFERENCES=$(find ~/.mozilla/firefox/* -name "prefs.js" 2>/dev/null)
+PREFERENCES=$(find ~/.mozilla/firefox/* -name "times.json" 2>/dev/null)
+echo "PREFERENCES: \"$PREFERENCES\""
 
 if [ -z "${PREFERENCES}" ]
 then
-	# there is no firefox profile yet
-	# let's create one now
-	firefox -CreateProfile default
-	PREFERENCES=$(find ~/.mozilla/firefox/* -name "prefs.js" 2>/dev/null)
+	echo "there is no firefox profile yet, let's create one now..."
+	firefox -CreateProfile "default $HOME/.mozilla/firefox/default-profile"
+	# Work around firefox bug, see
+	# https://bugzilla.mozilla.org/show_bug.cgi?id=1558597
+	echo "[Profile0]
+Name=default
+IsRelative=1
+Path=default-profile
+Default=1
+
+[General]
+StartWithLastProfile=1
+Version=2
+
+[Install3B6073811A6ABF12]
+Default=default-profile
+Locked=1" > $HOME/.mozilla/firefox/profiles.ini
+
+	echo "[3B6073811A6ABF12]
+Default=default-profile
+Locked=1" > $HOME/.mozilla/firefox/installs.ini
+
+	PREFERENCES=$(find ~/.mozilla/firefox/* -name "times.json" 2>/dev/null)
+	echo "PREFERENCES: \"$PREFERENCES\""
 	# also create an initial empty certificate database
 	# (otherwise the certutil calls below fail)
 	PROFILE_DIR="$(dirname ${PREFERENCES})"
+	echo "PROFILE_DIR: \"$PROFILE_DIR\""
+	echo "creating new certificate and key database"
 	certutil -d "sql:${PROFILE_DIR}" -N --empty-password
 fi
 
@@ -21,7 +43,13 @@ fi
 for PREFERENCE in ${PREFERENCES}
 do
 	PROFILE_DIR="$(dirname ${PREFERENCE})"
+	echo "PROFILE_DIR: \"$PROFILE_DIR\""
 	echo "updating Lernstick firewall certificate in profile ${PROFILE_DIR}"
-	certutil -d "sql:${PROFILE_DIR}" -D -n "$CERTNAME"
-	certutil -d "sql:${PROFILE_DIR}" -A -n "$CERTNAME" -t "TCu,Cuw,Tuw" -i "${CERTFILE}"
+	if certutil -d "sql:${PROFILE_DIR}" -L | grep -q "$CERTNAME"
+	then
+		echo "removing old Lernstick Firewall certificate"
+		certutil -d "sql:${PROFILE_DIR}" -D -n "$CERTNAME"
+	fi
+	echo "adding new Lernstick Firewall certificate"
+	certutil -d "sql:${PROFILE_DIR}" -A -n "$CERTNAME" -t "TC,C,C" -i "${CERTFILE}"
 done
