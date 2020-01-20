@@ -1,3 +1,11 @@
+lernstick-firewall (2.22) lernstick-10; urgency=medium
+
+  * [44c66d] updated .gitignore file
+  * [e1c03b] updated certificate installation script to work around a bug in
+             newer Firefox versions
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Mon, 20 Jan 2020 19:50:13 +0100
+
 lernstick-firewall (2.21) lernstick-10; urgency=medium
 
   * [133e27] allow reload via systemctl
