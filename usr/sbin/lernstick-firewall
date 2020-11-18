@@ -192,7 +192,7 @@ do_start()
     ${IP6TABLES} --append OUTPUT --protocol UDP --sport bootpc --dport bootps --jump ACCEPT
 
     # allow NTP requests
-    ${IPTABLES} --append OUTPUT --protocol UDP --sport ntp --dport ntp --jump ACCEPT
+    ${IPTABLES} --append OUTPUT --protocol UDP --dport ntp --jump ACCEPT
 
     # allow DHCPv6
     ${IP6TABLES} --append INPUT --protocol UDP --dport dhcpv6-client --jump ACCEPT
