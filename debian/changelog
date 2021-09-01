@@ -1,3 +1,9 @@
+lernstick-firewall (2.24) lernstick-11; urgency=medium
+
+  * [523e65] updated for Debian 11
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Thu, 02 Sep 2021 01:53:16 +0200
+
 lernstick-firewall (2.23) lernstick-10; urgency=medium
 
   * [b03106] fixed ntp rule
