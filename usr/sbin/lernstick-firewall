@@ -194,11 +194,11 @@ do_start()
     # allow NTP requests
     ${IPTABLES} --append OUTPUT --protocol UDP --dport ntp --jump ACCEPT
 
-    # allow DHCPv6
-    ${IP6TABLES} --append INPUT --protocol UDP --dport dhcpv6-client --jump ACCEPT
-    ${IP6TABLES} --append INPUT --protocol TCP --dport dhcpv6-client --jump ACCEPT
-    ${IP6TABLES} --append OUTPUT --protocol UDP --dport dhcpv6-server --jump ACCEPT
-    ${IP6TABLES} --append OUTPUT --protocol TCP --dport dhcpv6-server --jump ACCEPT
+    # allow DHCPv6 (dhcpv6-client = 546, dhcpv6-server = 547)
+    ${IP6TABLES} --append INPUT --protocol UDP --dport 546 --jump ACCEPT
+    ${IP6TABLES} --append INPUT --protocol TCP --dport 546 --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol UDP --dport 547 --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol TCP --dport 547 --jump ACCEPT
 
     # allow some CUPS printer probes:
     # Canon (Port 8610: MFNP Service, Port 8612: BJNP Port 2)
