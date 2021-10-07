@@ -1,3 +1,10 @@
+lernstick-firewall (2.25) lernstick-11; urgency=medium
+
+  * [b0c226] use config directory for squid whitelist
+  * [ade70c] added empty default config file
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Thu, 07 Oct 2021 11:48:07 +0200
+
 lernstick-firewall (2.24) lernstick-11; urgency=medium
 
   * [523e65] updated for Debian 11
