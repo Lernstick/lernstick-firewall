@@ -226,6 +226,7 @@ do_reload()
     ${FIREWALL} reload-whitelist || RETVAL="2"
 
     [ "$VERBOSE" != no ] && log_daemon_msg "Squid reconfigure"
+    cat /etc/lernstick-firewall/proxy.d/* > /etc/lernstick-firewall/url_whitelist
     ${SQUID} -k reconfigure || RETVAL="2"
 
     case "$RETVAL" in
