@@ -47,7 +47,7 @@ block_all ()
 }
 
 #
-# funciton to set the default policy
+# function to set the default policy
 #
 set_default ()
 {
@@ -215,14 +215,21 @@ do_start()
     ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
     ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
     ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_HTTPS} --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol TCP --destination ::1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol TCP --destination ::1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol TCP --destination ::1 --dport ${PROXY_PORT_HTTPS} --jump ACCEPT
 
     # allow outgoing traffic for proxy to http and https on any server
     ${IPTABLES} --append OUTPUT --protocol TCP --dport http --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
     ${IPTABLES} --append OUTPUT --protocol TCP --dport https --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol TCP --dport http --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
+    ${IP6TABLES} --append OUTPUT --protocol TCP --dport https --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
 
     # setup NAT forwarding of http and https to squid
     ${IPTABLES} -t nat -A OUTPUT -p TCP --dport http -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTP}
     ${IPTABLES} -t nat -A OUTPUT -p TCP --dport https -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTPS}
+    ${IP6TABLES} -t nat -A OUTPUT -p TCP --dport http -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTP}
+    ${IP6TABLES} -t nat -A OUTPUT -p TCP --dport https -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTPS}
 
     # Regenerate CA cert
     #openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 -extensions v3_ca \
