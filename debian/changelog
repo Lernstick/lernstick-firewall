@@ -1,3 +1,9 @@
+lernstick-firewall (2.27) lernstick-11; urgency=medium
+
+  * [781e07] added support for a list of servers that have to be spliced
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Thu, 13 Jan 2022 12:42:03 +0100
+
 lernstick-firewall (2.26) lernstick-11; urgency=medium
 
   * [b8121d] use squid proxy also for IPv6
