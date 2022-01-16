@@ -1,3 +1,10 @@
+lernstick-firewall (2.28) lernstick-11; urgency=medium
+
+  * [32fa01] improved SSL bump configuration
+             (peek before splicing to get the SNI hostnames)
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Sun, 16 Jan 2022 16:33:37 +0100
+
 lernstick-firewall (2.27) lernstick-11; urgency=medium
 
   * [781e07] added support for a list of servers that have to be spliced
