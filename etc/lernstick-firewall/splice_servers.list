@@ -4,5 +4,5 @@
 # For servers specified in this file Squid will fall back to SSL splicing.
 # Servers names must be defined with regular expressions, e.g.
 # www\.example\.org
-# .*\.example\.org
+# .example\.org
 #
