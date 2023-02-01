@@ -1,3 +1,10 @@
+lernstick-firewall (2.29) lernstick-11; urgency=medium
+
+  * [64a218] fixed syntax in comment with splicing hints
+  * [94bc58] added workaround for https://bugs.squid-cache.org/show_bug.cgi?id=5214
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Wed, 01 Feb 2023 21:05:48 +0100
+
 lernstick-firewall (2.28) lernstick-11; urgency=medium
 
   * [32fa01] improved SSL bump configuration
