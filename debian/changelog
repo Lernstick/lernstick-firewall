@@ -1,3 +1,9 @@
+lernstick-firewall (2.31) lernstick-12; urgency=medium
+
+  * [9dd2ff] added support for URL blacklisting
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Mon, 15 Jan 2024 19:56:36 +0100
+
 lernstick-firewall (2.30) lernstick-12; urgency=medium
 
   * [8c4bec] added iptables to dependencies
