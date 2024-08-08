@@ -1,13 +1,25 @@
 [Unit]
 Description=The Lernstick firewall
 DefaultDependencies=no
-Before=basic.target dbus-org.freedesktop.nm-dispatcher.service
+Before=network.target dbus-org.freedesktop.nm-dispatcher.service NetworkManager.service
+Conflicts=squid.service
 
 [Service]
-Type=forking
-ExecStart=/lib/systemd/lernstick-firewall start
-ExecStop=/lib/systemd/lernstick-firewall stop
-ExecReload=/lib/systemd/lernstick-firewall reload
+Type=notify
+PIDFile=/run/squid.pid
+Group=proxy
+RuntimeDirectory=squid
+RuntimeDirectoryMode=0775
+ExecStartPre=/usr/sbin/squid --foreground -z
+ExecStartPre=/usr/bin/bash -c "cat /etc/lernstick-firewall/proxy.d/* > /etc/lernstick-firewall/url_whitelist"
+ExecStartPre=/usr/sbin/lernstick-firewall start
+ExecStart=/usr/sbin/squid --foreground -sYC -f /etc/lernstick-firewall/squid.conf
+ExecReload=/usr/bin/bash -c "cat /etc/lernstick-firewall/proxy.d/* > /etc/lernstick-firewall/url_whitelist && /usr/sbin/lernstick-firewall reload-whitelist && /bin/kill -HUP $MAINPID"
+ExecStopPost=/usr/sbin/lernstick-firewall stop
+KillMode=mixed
+NotifyAccess=all
+
 
 [Install]
-WantedBy=basic.target
+WantedBy=network.target
+RequiredBy=dbus-org.freedesktop.nm-dispatcher.service NetworkManager.service
