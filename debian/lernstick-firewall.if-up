@@ -1,5 +1,0 @@
-#!/bin/sh
-
-[ "$METHOD" != "loopback" -a "$METHOD" != "none" ] && /lib/systemd/lernstick-firewall reload
-
-exit 0

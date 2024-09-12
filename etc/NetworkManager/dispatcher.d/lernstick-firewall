@@ -1,0 +1,31 @@
+#!/bin/sh
+
+case "${NM_DISPATCHER_ACTION}" in
+	up)
+		# Do nothing for the loopback interface
+		if [ "${DEVICE_IFACE}" = "lo" ]
+		then
+			exit 0
+		fi
+
+		# Double check if some DNS is available
+		has_dns=false
+		for _ in 1 2 3 4 5
+		do
+			if dig > /dev/null 2>&1
+			then
+				has_dns=true
+				break
+			fi
+			sleep 1
+		done
+
+		if ! ${has_dns}
+		then
+			exit 2
+		fi
+
+		systemctl reload lernstick-firewall
+		;;
+esac
+

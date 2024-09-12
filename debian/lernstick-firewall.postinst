@@ -43,9 +43,9 @@ if [ "$1" = "configure" ]; then
         fi
     done
 
-    # disable squid from starting its own service and stop it if it's already running
-    update-rc.d squid disable
-    /etc/init.d/squid stop
+  
+    # Tigger preset that disables squid
+    systemctl preset squid.service
 
     # install ca to local ca db
     update-ca-certificates
