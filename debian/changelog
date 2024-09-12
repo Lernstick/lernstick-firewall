@@ -1,3 +1,10 @@
+lernstick-firewall (3.0) lernstick-12; urgency=medium
+
+  [ Thore Sommer ]
+  * [7e55b1] migrate fully to systemd and network manager
+
+ -- Ronny Standtke <ronny.standtke@gmx.net>  Thu, 12 Sep 2024 12:40:46 +0200
+
 lernstick-firewall (2.31) lernstick-12; urgency=medium
 
   * [9dd2ff] added support for URL blacklisting
