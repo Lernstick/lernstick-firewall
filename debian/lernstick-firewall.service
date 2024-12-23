@@ -21,5 +21,4 @@ NotifyAccess=all
 
 
 [Install]
-WantedBy=network.target
-RequiredBy=dbus-org.freedesktop.nm-dispatcher.service NetworkManager.service
+WantedBy=network.target dbus-org.freedesktop.nm-dispatcher.service NetworkManager.service
