@@ -18,7 +18,6 @@ if [ "$1" = "purge" ]; then
     # remove statoverrides for conffiles
     confdir="/etc/lernstick-firewall"
     conffiles="${confdir}/lernstick-firewall.conf
-               ${confdir}/squid.conf
                ${confdir}/url_whitelist
                ${confdir}/net_whitelist"
     for cf in ${conffiles}; do

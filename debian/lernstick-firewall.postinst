@@ -21,6 +21,14 @@ if [ "$1" = "configure" ]; then
         usermod -g ${username} ${username}
     fi
 
+    # Check if proxy user and group exists
+    if ! getent group proxy > /dev/null; then
+        addgroup --quiet --system proxy
+        usermod -g proxy proxy
+    fi
+
+    chown -R proxy:proxy /usr/share/lernstick-firewall/ca
+
     # fix logdir permissions, keep admin overrides done 
     # with dpkg-statoverride
 
@@ -34,7 +42,6 @@ if [ "$1" = "configure" ]; then
     # fix configfile permissions, keep admin overrides
     confdir="/etc/lernstick-firewall"
     conffiles="${confdir}/lernstick-firewall.conf
-               ${confdir}/squid.conf
                ${confdir}/url_whitelist
                ${confdir}/net_whitelist"
     for cf in ${conffiles}; do
@@ -42,10 +49,6 @@ if [ "$1" = "configure" ]; then
             dpkg-statoverride --update --add root ${username} 0640 ${cf}
         fi
     done
-
-  
-    # Tigger preset that disables squid
-    systemctl preset squid.service
 
     # install ca to local ca db
     update-ca-certificates

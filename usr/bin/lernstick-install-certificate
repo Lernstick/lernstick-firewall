@@ -1,7 +1,7 @@
 #!/bin/sh
 
 CERTNAME="Lernstick Firewall"
-CERTFILE="/etc/lernstick-firewall/ca.pem"
+CERTFILE="/usr/share/lernstick-firewall/ca/mitmproxy-ca.pem"
 PREFERENCES=$(find ~/.mozilla/firefox/* -name "times.json" 2>/dev/null)
 echo "PREFERENCES: \"$PREFERENCES\""
 

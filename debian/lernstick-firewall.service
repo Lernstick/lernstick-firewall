@@ -2,22 +2,18 @@
 Description=The Lernstick firewall
 DefaultDependencies=no
 Before=network.target dbus-org.freedesktop.nm-dispatcher.service NetworkManager.service
-Conflicts=squid.service
+
 
 [Service]
-Type=notify
-PIDFile=/run/squid.pid
+Type=exec
+User=proxy
 Group=proxy
-RuntimeDirectory=squid
+RuntimeDirectory=lernstick-firewall
 RuntimeDirectoryMode=0775
-ExecStartPre=/usr/sbin/squid --foreground -z
-ExecStartPre=/usr/bin/bash -c "cat /etc/lernstick-firewall/proxy.d/* > /etc/lernstick-firewall/url_whitelist"
-ExecStartPre=/usr/sbin/lernstick-firewall start
-ExecStart=/usr/sbin/squid --foreground -sYC -f /etc/lernstick-firewall/squid.conf
-ExecReload=/usr/bin/bash -c "cat /etc/lernstick-firewall/proxy.d/* > /etc/lernstick-firewall/url_whitelist && /usr/sbin/lernstick-firewall reload-whitelist && /bin/kill -HUP $MAINPID"
-ExecStopPost=/usr/sbin/lernstick-firewall stop
-KillMode=mixed
-NotifyAccess=all
+ExecStartPre=+/usr/bin/bash -c "cat /etc/lernstick-firewall/proxy.d/* > /etc/lernstick-firewall/url_whitelist"
+ExecStartPre=+/usr/sbin/lernstick-firewall start
+ExecStart=/usr/bin/mitmdump  --set confdir=/usr/share/lernstick-firewall/ca --mode transparent -s /usr/share/lernstick-firewall/filter.py
+ExecStopPost=+/usr/sbin/lernstick-firewall stop
 
 
 [Install]

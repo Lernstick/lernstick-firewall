@@ -25,9 +25,7 @@ IPTABLES="/sbin/iptables"
 IP6TABLES="/sbin/ip6tables"
 PROXY_UID=proxy
 PROXY_GID=proxy
-PROXY_PORT_DIRECT=3127
-PROXY_PORT_HTTP=3128
-PROXY_PORT_HTTPS=3129
+PROXY_PORT_DIRECT=8080
 
 # Read configuration variable file if it is present
 [ -r /etc/lernstick-firewall/lernstick-firewall.conf ] && . /etc/lernstick-firewall/lernstick-firewall.conf
@@ -51,6 +49,10 @@ block_all ()
 #
 set_default ()
 {
+    sysctl -w net.ipv4.ip_forward=1
+    sysctl -w net.ipv6.conf.all.forwarding=1
+    sysctl -w net.ipv4.conf.all.send_redirects=0
+
     # Default policies
     ${IPTABLES} --policy INPUT $1
     ${IPTABLES} --policy OUTPUT $1
@@ -151,6 +153,10 @@ do_start()
     do_flush
     set_default DROP
 
+    sysctl -w net.ipv4.ip_forward=1
+    sysctl -w net.ipv6.conf.all.forwarding=1
+    sysctl -w net.ipv4.conf.all.send_redirects=0
+
     # allow related packages
     ${IPTABLES} --append INPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
     ${IPTABLES} --append OUTPUT --match state --state ESTABLISHED,RELATED --jump ACCEPT
@@ -213,11 +219,6 @@ do_start()
 
     # access to local proxy
     ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
-    ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
-    ${IPTABLES} --append OUTPUT --protocol TCP --destination 127.0.0.1 --dport ${PROXY_PORT_HTTPS} --jump ACCEPT
-    ${IP6TABLES} --append OUTPUT --protocol TCP --destination ::1 --dport ${PROXY_PORT_DIRECT} --jump ACCEPT
-    ${IP6TABLES} --append OUTPUT --protocol TCP --destination ::1 --dport ${PROXY_PORT_HTTP} --jump ACCEPT
-    ${IP6TABLES} --append OUTPUT --protocol TCP --destination ::1 --dport ${PROXY_PORT_HTTPS} --jump ACCEPT
 
     # allow outgoing traffic for proxy to http and https on any server
     ${IPTABLES} --append OUTPUT --protocol TCP --dport http --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
@@ -226,10 +227,10 @@ do_start()
     ${IP6TABLES} --append OUTPUT --protocol TCP --dport https --match owner --uid-owner ${PROXY_UID} --gid-owner ${PROXY_GID} --jump ACCEPT
 
     # setup NAT forwarding of http and https to squid
-    ${IPTABLES} -t nat -A OUTPUT -p TCP --dport http -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTP}
-    ${IPTABLES} -t nat -A OUTPUT -p TCP --dport https -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTPS}
-    ${IP6TABLES} -t nat -A OUTPUT -p TCP --dport http -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTP}
-    ${IP6TABLES} -t nat -A OUTPUT -p TCP --dport https -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_HTTPS}
+    ${IPTABLES} -t nat -A OUTPUT -p TCP --dport http -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_DIRECT}
+    ${IPTABLES} -t nat -A OUTPUT -p TCP --dport https -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_DIRECT}
+    ${IP6TABLES} -t nat -A OUTPUT -p TCP --dport http -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_DIRECT}
+    ${IP6TABLES} -t nat -A OUTPUT -p TCP --dport https -m owner ! --gid-owner ${PROXY_GID} -j REDIRECT --to-port ${PROXY_PORT_DIRECT}
 
     # Regenerate CA cert
     #openssl req -new -newkey rsa:2048 -sha256 -days 365 -nodes -x509 -extensions v3_ca \
@@ -244,11 +245,6 @@ do_start()
     certutil -d $HOME/.pki/nssdb -N -f $HOME/.pki/pw
     rm -f $HOME/.pki/pw
 
-    # Recreate dynamic SSL cert DB
-    rm -rf /var/lib/squid/ssl_db
-    mkdir -p /var/lib/squid
-    /usr/lib/squid/security_file_certgen -c -s /var/lib/squid/ssl_db -M 500MB
-    chown proxy:proxy -R /var/lib/squid/ssl_db
 
     # whitelist rules chain, this chain will always be traversed on OUTPUT, create it if it does not exist
     # the whitelist remains empty if not yet existing or unchanged if it already exists
